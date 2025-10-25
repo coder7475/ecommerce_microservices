@@ -14,14 +14,10 @@ To install all packages for all workspaces:
 pnpm install
 ```
 
-Run in dev mode:
+Run all in dev mode:
 
 ```bash
-pnpm --filter <app_name> dev
-```
-
-```bash
-pnpm --filter my-first-app-remix dev
+pnpm dev
 ```
 
 ## Run Docker Compose
@@ -29,3 +25,11 @@ pnpm --filter my-first-app-remix dev
 ```sh
 docker compose up -d
 ```
+
+## Create new service using Hono & Nodejs
+
+```sh
+pnpm create hono <my-app>
+```
+
+Select nodejs from framework

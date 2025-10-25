@@ -8,7 +8,9 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.19.5",
-    "hono": "^4.10.3"
+    "dotenv": "^17.2.3",
+    "hono": "^4.10.3",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
