@@ -1,10 +1,16 @@
 {
   "name": "ecommerce-microservices",
   "version": "1.0.0",
-  "description": "",
+  "description": "microservices for ecommerce application",
   "main": "index.js",
+  "workspaces": [
+    "services/*",
+    "libs/*"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint"
   },
   "keywords": [],
   "author": "",

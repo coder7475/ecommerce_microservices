@@ -1,4 +1,6 @@
-## PNPM Monorepo
+# Ecommerce Microservice
+
+## Usage
 
 Install pnpm:
 
