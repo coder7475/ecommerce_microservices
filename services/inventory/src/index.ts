@@ -4,7 +4,8 @@ import { logger } from "hono/logger";
 import { createInventory } from "./controllers";
 import { serve } from "@hono/node-server";
 
-// Environment variables are handled by Cloudflare Workers runtime
+import dotenv from "dotenv";
+dotenv.config();
 
 // App
 const app = new Hono();
