@@ -4,13 +4,19 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import dotenv from "dotenv";
 
+// Envs
 dotenv.config();
+const port = Number(process.env.PORT) || 3001;
+const serviceName = process.env.Service_Name || "inventory-service";
 
+// App
 const app = new Hono();
 
+// Middlewares
 app.use("*", cors());
 app.use("*", logger());
 
+// Routes
 app.get("/", (c) => {
   return c.json({
     message: "Running Inventory Microservice!",
@@ -36,13 +42,14 @@ app.notFound((c) => {
 });
 
 // Server
-const port = Number(process.env.PORT) || 3001;
 serve(
   {
     fetch: app.fetch,
     port,
   },
   (info) => {
-    console.log(`Server is running on http://localhost:${info.port}`);
+    console.log(
+      `${serviceName} Server is running on http://localhost:${info.port}`
+    );
   }
 );
