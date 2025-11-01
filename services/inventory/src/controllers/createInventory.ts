@@ -1,42 +1,52 @@
-import prisma from "@/prisma_db";
 import { InventoryCreateDTOSchema } from "@/schemas";
-import { Context, Next } from "hono";
+import { Context } from "hono";
+import { ActionType } from "../../generated/prisma/enums";
 
-export const createInventory = async (c: Context<{}>, next: Next) => {
-  try {
-    const parsedBody = InventoryCreateDTOSchema.safeParse(c.req.parseBody);
-    if (!parsedBody.success) {
-      return c.json(
-        {
-          error: parsedBody.error,
-        },
-        404
-      );
-    }
+// Context type matching the Hono app configuration
+type CreateInventoryContext = Context<{
+  Variables: {
+    prisma: import("../../generated/prisma/client").PrismaClient;
+  };
+}>;
 
-    // Create Inventory
-    const inventory = await prisma.Inventory.create({
-      data: {
-        ...parsedBody.data,
-        histories: {
-          create: {
-            actionType: "IN",
-            quantityChanged: parsedBody.data.quantity,
-            lastQuantity: 0,
-            newQuantity: parsedBody.data.quantity,
-          },
-        },
-      },
-    });
+const createInventory = async (c: CreateInventoryContext) => {
+  // Get Prisma client from context (set by middleware)
+  const prisma = c.get("prisma");
 
-    return c.json(inventory, 201);
-  } catch (error) {
+  // Parse and validate request body
+  const parsedBody = InventoryCreateDTOSchema.safeParse(
+    await c.req.parseBody()
+  );
+  if (!parsedBody.success) {
     return c.json(
       {
-        error: "Failed to create inventory",
-        message: error instanceof Error ? error.message : String(error),
+        error: "Validation failed",
+        details: parsedBody.error.issues,
       },
-      500
+      400
     );
   }
+
+  // Create inventory
+  const inventory = await prisma.inventory.create({
+    data: {
+      ...parsedBody.data,
+      Histories: {
+        create: {
+          actionType: ActionType.INIT,
+          quantityChanged: parsedBody.data.quantity,
+          lastQuantity: 0,
+          newQuantity: parsedBody.data.quantity,
+        },
+      },
+    },
+    select: {
+      id: true,
+      quantity: true,
+    },
+  });
+
+  return c.json(inventory, 201);
 };
+
+export default createInventory;
