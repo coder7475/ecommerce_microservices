@@ -5,10 +5,13 @@
     "dev": "wrangler dev",
     "build": "tsc && tsc-alias",
     "start": "node dist/index.js",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "migrate:dev": "prisma migrate dev",
+    "migrate:deploy": "prisma migrate deploy"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.5",
+    "@prisma/client": "^6.18.0",
     "dotenv": "^17.2.3",
     "hono": "^4.10.3",
     "zod": "^4.1.12"

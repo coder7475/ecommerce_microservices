@@ -2,6 +2,10 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 
+// Load environment variables from .env
+import dotenv from "dotenv";
+dotenv.config();
+
 // App
 const app = new Hono();
 const serviceLogger = logger();
@@ -14,6 +18,7 @@ app.use("*", serviceLogger);
 app.get("/", (c) => {
   return c.json({
     message: "Running Inventory Microservice!",
+    envLoaded: !!process.env.DATABASE_URL, // Example of env utilization
   });
 });
 
