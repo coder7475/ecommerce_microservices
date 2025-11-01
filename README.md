@@ -1,35 +1,138 @@
-# Ecommerce Microservice
+# 🚀 Ecommerce Microservice
 
-## Usage
+## 🛠️ Quickstart
 
-Install pnpm:
+### 1. Install pnpm
 
 ```bash
 npm install -g pnpm
 ```
 
-To install all packages for all workspaces:
+### 2. Install all dependencies for all workspaces
 
 ```bash
 pnpm install
 ```
 
-Run all in dev mode:
+### 3. Run all services in development mode
 
 ```bash
 pnpm dev
 ```
 
-## Run Docker Compose
+---
 
-```sh
+## 🐳 Running with Docker Compose
+
+Start all services in the background:
+
+```bash
 docker compose up -d
 ```
 
-## Create new service using Hono & Nodejs
+---
 
-```sh
-pnpm create hono <my-app>
+## 🗄️ Database Access via pgAdmin
+
+You can use **pgAdmin** (running in Docker) to manage your **PostgreSQL** service. Follow these steps:
+
+---
+
+### 🧭 Step 1: Start the Services
+
+```bash
+docker compose up -d
 ```
 
-Select nodejs from framework
+This launches both containers:
+
+- **postgres_db** (PostgreSQL)
+- **pgadmin_ui** (pgAdmin 4)
+
+Check their status:
+
+```bash
+docker ps
+```
+
+---
+
+### 🖥️ Step 2: Open pgAdmin in Your Browser
+
+Navigate to:
+
+```
+http://localhost:5050
+```
+
+Login with:
+
+- **Email:** `admin@example.com`
+- **Password:** `admin123`
+
+---
+
+### ⚙️ Step 3: Register the PostgreSQL Server in pgAdmin
+
+1. Right-click **Servers → Register → Server…**
+2. Under the **General** tab, choose a name (e.g., `PostgresDB`)
+3. Under the **Connection** tab, set:
+
+   - **Host name/address:** `postgres` <sub>(service name from docker-compose)</sub>
+   - **Port:** `5432`
+   - **Maintenance database:** `app_db`
+   - **Username:** `admin`
+   - **Password:** `admin123`
+   - (Optional) Check **Save Password**
+
+Click **Save** to connect!
+
+---
+
+### 🏠 (Optional) Connect from Your Local Machine
+
+To connect with external tools (e.g., DBeaver, psql) use:
+
+```sh
+Host: localhost
+Port: 5432
+User: admin
+Password: admin123
+Database: app_db
+```
+
+This works because your `docker-compose.yml` maps:
+
+```yaml
+ports:
+  - "5432:5432"
+```
+
+---
+
+### ✅ Verifying the Connection
+
+After connecting in pgAdmin, you should see:
+
+```
+Servers
+ └── PostgresDB
+      ├── Databases
+      │    └── app_db
+```
+
+---
+
+### 📚 References
+
+- [PostgreSQL Docker Image](https://hub.docker.com/_/postgres)
+- [pgAdmin Docker Image](https://hub.docker.com/r/dpage/pgadmin4)
+- [Docker Compose Networking](https://docs.docker.com/compose/networking/)
+
+---
+
+## 🆕 Create a New Microservice with Hono & Node.js
+
+```bash
+pnpm create hono <my-app>
+```

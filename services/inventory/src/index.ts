@@ -11,10 +11,11 @@ const serviceName = process.env.Service_Name || "inventory-service";
 
 // App
 const app = new Hono();
+const serviceLogger = logger();
 
 // Middlewares
 app.use("*", cors());
-app.use("*", logger());
+app.use("*", serviceLogger);
 
 // Routes
 app.get("/", (c) => {
