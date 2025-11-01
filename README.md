@@ -78,7 +78,7 @@ Login with:
 2. Under the **General** tab, choose a name (e.g., `PostgresDB`)
 3. Under the **Connection** tab, set:
 
-   - **Host name/address:** `postgres` <sub>(service name from docker-compose)</sub>
+   - **Host name/address:** `postgres` <sub>(service name from docker-compose)</sub> or `host.docker.internal`
    - **Port:** `5432`
    - **Maintenance database:** `app_db`
    - **Username:** `admin`

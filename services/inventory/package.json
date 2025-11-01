@@ -2,9 +2,10 @@
   "name": "inventory-service",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "wrangler dev",
     "build": "tsc && tsc-alias",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "deploy": "wrangler deploy"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.5",
@@ -14,6 +15,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
+    "prisma": "^6.18.0",
     "tsc-alias": "^1.8.16",
     "tsx": "^4.7.1",
     "typescript": "^5.8.3"

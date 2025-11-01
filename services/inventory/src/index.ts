@@ -1,13 +1,6 @@
-import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
-import dotenv from "dotenv";
-
-// Envs
-dotenv.config();
-const port = Number(process.env.PORT) || 3001;
-const serviceName = process.env.Service_Name || "inventory-service";
 
 // App
 const app = new Hono();
@@ -43,14 +36,4 @@ app.notFound((c) => {
 });
 
 // Server
-serve(
-  {
-    fetch: app.fetch,
-    port,
-  },
-  (info) => {
-    console.log(
-      `${serviceName} Server is running on http://localhost:${info.port}`
-    );
-  }
-);
+export default app;
