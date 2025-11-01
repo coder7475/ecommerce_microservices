@@ -10,7 +10,7 @@ import { serve } from "@hono/node-server";
 const app = new Hono();
 const serviceLogger = logger();
 const port = process.env.PORT || 3000;
-
+console.log(port);
 // Middlewares
 app.use("*", cors());
 app.use("*", serviceLogger);
