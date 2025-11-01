@@ -9,6 +9,14 @@
 | GET    | `/inventories/:id`         | Fetch inventory item      |
 | GET    | `/inventories/:id/details` | Fetch inventory details   |
 
+## Data Models
+
+Inventory
+
+```
+
+```
+
 ## Development
 
 Install dependencies:
