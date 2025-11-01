@@ -2,7 +2,8 @@
   "name": "inventory-service",
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
+    "dev": "tsx watch src/index.ts",
+    "wrangler:dev": "wrangler dev",
     "build": "tsc && tsc-alias",
     "start": "node dist/index.js",
     "deploy": "wrangler deploy",
@@ -16,6 +17,7 @@
     "@hono/node-server": "^1.19.5",
     "@prisma/adapter-pg": "^6.18.0",
     "@prisma/client": "^6.18.0",
+    "dotenv": "^17.2.3",
     "hono": "^4.10.3",
     "pg": "^8.13.1",
     "zod": "^4.1.12"

@@ -1,6 +1,6 @@
 import { InventoryCreateDTOSchema } from "@/schemas";
 import { Context } from "hono";
-import { ActionType } from "../../generated/prisma/enums";
+import { ActionType } from "../../generated/prisma";
 
 // Context type matching the Hono app configuration
 type CreateInventoryContext = Context<{
