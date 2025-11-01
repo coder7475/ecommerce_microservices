@@ -13,3 +13,28 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Inventory {
+  id String @id @default(cuid())
+  sku String @unique
+  productId String @unique
+  quantity Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Histories History[] @relation("Histories")
+}
+
+enum ActionType {
+  UP 
+  DOWN 
+}
+
+model History {
+  id String @id @default(cuid())
+  actionType ActionType
+  quantityChanged Int
+  lastQuantity Int
+  newQuantity Int 
+  inventory Inventory @relation("Histories", fields: [inventoryId], references: [id])
+  inventoryId String
+}
