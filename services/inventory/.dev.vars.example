@@ -1,6 +1,0 @@
-# Cloudflare Workers environment variables
-# Copy this file to .dev.vars and fill in your actual values
-# Note: .dev.vars is used by Cloudflare Workers (wrangler) and is gitignored by default
-
-DATABASE_URL="postgresql://user:password@host:5432/database?sslmode=require"
-

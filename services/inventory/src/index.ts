@@ -1,80 +1,72 @@
-import { Hono } from "hono";
-import { cors } from "hono/cors";
-import { logger } from "hono/logger";
+import express, { Request, Response, NextFunction } from "express";
+import cors from "cors";
+import morgan from "morgan";
 import {
   createInventory,
   getInventoryById,
   getInventoryDetailsById,
   updateInventory,
 } from "./controllers";
-import { serve } from "@hono/node-server";
-
-import dotenv from "dotenv";
-dotenv.config();
 
 // App
-const app = new Hono();
-const serviceLogger = logger();
-const port = process.env.PORT || 3000;
+const app = express();
 
 // Middlewares
-app.use("*", cors());
-app.use("*", serviceLogger);
+app.use(cors());
+app.use(morgan("dev")); // or morgan("combined") for production
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.get("/", (c) => {
-  const url = `${c.req.url}`;
-  console.log(`Root route accessed at ${url} on port ${port}`);
-  return c.json({
+app.get("/api", (req: Request, res: Response) => {
+  const url = `${req.protocol}://${req.get("host")}${req.originalUrl}`;
+  console.log(`Root route accessed at ${url}`);
+  return res.json({
     message: "Running Inventory Microservice!",
     envLoaded: !!process.env.DATABASE_URL,
     url,
-    port: Number(port),
+    environment: process.env.NODE_ENV || "development",
   });
 });
 
-app.get("/health", (c) => {
-  return c.json({
+app.get("/api/health", (req: Request, res: Response) => {
+  return res.json({
     status: "Healthy",
     message: "Running Inventory Microservice is healthy!",
   });
 });
 
 // Inventory Routes
-app.get("/inventory/:id/details", getInventoryDetailsById);
-app.get("/inventory/:id", getInventoryById);
-app.put("/inventory/:id", updateInventory);
-app.post("/inventory", createInventory);
+app.get("/api/inventory/:id/details", getInventoryDetailsById);
+app.get("/api/inventory/:id", getInventoryById);
+app.put("/api/inventory/:id", updateInventory);
+app.post("/api/inventory", createInventory);
+
 // 404 Not Found
-app.notFound((c) => {
-  return c.json(
-    {
-      error: "Route not found",
-      path: c.req.path,
-      timestamp: new Date().toISOString(),
-    },
-    404
-  );
+app.use((req: Request, res: Response) => {
+  return res.status(404).json({
+    error: "Route not found",
+    path: req.path,
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // Global Error Handler
-app.onError((err, c) => {
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error("Unhandled Error:", err);
-  return c.json(
-    {
-      error: "Internal Server Error",
-      message: err.message || "Something went wrong",
-      timestamp: new Date().toISOString(),
-    },
-    500
-  );
+  return res.status(500).json({
+    error: "Internal Server Error",
+    message: err.message || "Something went wrong",
+    timestamp: new Date().toISOString(),
+  });
 });
 
-// Server export
-console.log(`Starting Inventory Microservice on port http://localhost${port}`);
-serve({
-  fetch: app.fetch,
-  port: Number(port),
-});
+// Start server (for local development)
+const PORT = process.env.PORT || 3000;
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => {
+    console.log(`Server running on port http://localhost:${PORT}`);
+  });
+}
 
 export default app;
