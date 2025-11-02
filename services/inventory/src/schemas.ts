@@ -1,4 +1,5 @@
 import z from "zod";
+import { ActionType } from "../generated/prisma";
 
 export const InventoryCreateDTOSchema = z.object({
   productId: z.string(),
@@ -7,3 +8,9 @@ export const InventoryCreateDTOSchema = z.object({
 });
 
 export type InventoryCreateDTO = z.infer<typeof InventoryCreateDTOSchema>;
+
+// Update Schema
+export const InventoryUpdateDTOSchema = z.object({
+  quantity: z.number().int().positive(),
+  actionType: z.enum(ActionType),
+});
