@@ -29,8 +29,48 @@ const updateInventory = async (c: Context) => {
   }
 
   // find last history
+  const lastHistory = await prisma.history.findFirst({
+    where: { inventoryId: id },
+    orderBy: { createdAt: "desc" },
+  });
 
-  return c.json(inventory, 201);
+  // calculate the new inventory
+  let newQuantity = inventory.quantity;
+
+  if (parsedBody.data.actionType === ActionType.IN) {
+    newQuantity += parsedBody.data.quantity;
+  } else if (parsedBody.data.actionType === ActionType.OUT) {
+    newQuantity -= parsedBody.data.quantity;
+  } else {
+    return c.json(
+      {
+        message: "Invalid Action Type",
+      },
+      400
+    );
+  }
+
+  // update the inventory
+  const updatedInventory = await prisma.inventory.update({
+    where: { id },
+    data: {
+      quantity: newQuantity,
+      Histories: {
+        create: {
+          actionType: parsedBody.data.actionType,
+          quantityChanged: parsedBody.data.quantity,
+          lastQuantity: lastHistory?.newQuantity || 0,
+          newQuantity,
+        },
+      },
+    },
+    select: {
+      id: true,
+      quantity: true,
+    },
+  });
+
+  return c.json(updatedInventory, 200);
 };
 
 export default updateInventory;
