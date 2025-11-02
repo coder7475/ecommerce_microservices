@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "ActionType" AS ENUM ('UP', 'DOWN');
+CREATE TYPE "ActionType" AS ENUM ('INIT', 'IN', 'OUT');
 
 -- CreateTable
 CREATE TABLE "Inventory" (
@@ -21,6 +21,8 @@ CREATE TABLE "History" (
     "lastQuantity" INTEGER NOT NULL,
     "newQuantity" INTEGER NOT NULL,
     "inventoryId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "History_pkey" PRIMARY KEY ("id")
 );
@@ -32,4 +34,4 @@ CREATE UNIQUE INDEX "Inventory_sku_key" ON "Inventory"("sku");
 CREATE UNIQUE INDEX "Inventory_productId_key" ON "Inventory"("productId");
 
 -- AddForeignKey
-ALTER TABLE "History" ADD CONSTRAINT "History_inventoryId_fkey" FOREIGN KEY ("inventoryId") REFERENCES "Inventory"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "History" ADD CONSTRAINT "History_inventoryId_fkey" FOREIGN KEY ("inventoryId") REFERENCES "Inventory"("id") ON DELETE CASCADE ON UPDATE CASCADE;
