@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
-import { createInventory } from "./controllers";
+import { createInventory, updateInventory } from "./controllers";
 import { serve } from "@hono/node-server";
 
 import dotenv from "dotenv";
@@ -37,6 +37,7 @@ app.get("/health", (c) => {
 
 // Inventory Routes
 app.post("/inventory", createInventory);
+app.put("/inventory/:id", updateInventory);
 
 // 404 Not Found
 app.notFound((c) => {
