@@ -1,19 +1,9 @@
 import { InventoryCreateDTOSchema } from "@/schemas";
 import { Context } from "hono";
 import { ActionType } from "../../generated/prisma";
+import prisma from "@/prisma_db";
 
-// Context type matching the Hono app configuration
-type CreateInventoryContext = Context<{
-  Variables: {
-    prisma: import("../../generated/prisma/client").PrismaClient;
-  };
-}>;
-
-const createInventory = async (c: CreateInventoryContext) => {
-  // Get Prisma client from context (set by middleware)
-  const prisma = c.get("prisma");
-  console.log("Inside the create, the body get", c.body);
-
+const createInventory = async (c: Context) => {
   const body = await c.req.json();
 
   // Parse and validate request body
