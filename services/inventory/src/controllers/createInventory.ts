@@ -12,11 +12,13 @@ type CreateInventoryContext = Context<{
 const createInventory = async (c: CreateInventoryContext) => {
   // Get Prisma client from context (set by middleware)
   const prisma = c.get("prisma");
+  console.log("Inside the create, the body get", c.body);
+
+  const body = await c.req.json();
 
   // Parse and validate request body
-  const parsedBody = InventoryCreateDTOSchema.safeParse(
-    await c.req.parseBody()
-  );
+  const parsedBody = InventoryCreateDTOSchema.safeParse(body);
+
   if (!parsedBody.success) {
     return c.json(
       {
