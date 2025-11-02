@@ -11,7 +11,7 @@ dotenv.config();
 const app = new Hono();
 const serviceLogger = logger();
 const port = process.env.PORT || 3000;
-console.log(port);
+
 // Middlewares
 app.use("*", cors());
 app.use("*", serviceLogger);
@@ -64,6 +64,7 @@ app.onError((err, c) => {
 });
 
 // Server export
+console.log(`Starting Inventory Microservice on port http://localhost${port}`);
 serve({
   fetch: app.fetch,
   port: Number(port),
