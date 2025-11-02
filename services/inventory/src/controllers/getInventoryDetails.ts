@@ -1,14 +1,16 @@
 import { Context } from "hono";
 import prisma from "@/prisma_db";
 
-const getInventoryById = async (c: Context) => {
+const getInventoryDetailsById = async (c: Context) => {
   const id = c.req.param("id");
 
-  // Fetch inventory
+  // Fetch inventory and its history
   const inventory = await prisma.inventory.findUnique({
     where: { id },
-    select: {
-      quantity: true,
+    include: {
+      Histories: {
+        orderBy: { createdAt: "desc" }, // latest first
+      },
     },
   });
 
@@ -19,4 +21,4 @@ const getInventoryById = async (c: Context) => {
   return c.json(inventory, 200);
 };
 
-export default getInventoryById;
+export default getInventoryDetailsById;

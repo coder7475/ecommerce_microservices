@@ -4,6 +4,7 @@ import { logger } from "hono/logger";
 import {
   createInventory,
   getInventoryById,
+  getInventoryDetailsById,
   updateInventory,
 } from "./controllers";
 import { serve } from "@hono/node-server";
@@ -40,10 +41,10 @@ app.get("/health", (c) => {
 });
 
 // Inventory Routes
-app.post("/inventory", createInventory);
-app.put("/inventory/:id", updateInventory);
+app.get("/inventory/:id/details", getInventoryDetailsById);
 app.get("/inventory/:id", getInventoryById);
-
+app.put("/inventory/:id", updateInventory);
+app.post("/inventory", createInventory);
 // 404 Not Found
 app.notFound((c) => {
   return c.json(
