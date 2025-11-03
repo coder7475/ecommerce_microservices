@@ -2,6 +2,11 @@ import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import morgan from "morgan";
 import helmet from "helmet";
+import {
+  CreateProductController,
+  GetProductController,
+  GetProductDetailsController,
+} from "./controller";
 
 // App
 const app = express();
@@ -38,6 +43,9 @@ app.get("/api/health", (req: Request, res: Response) => {
 });
 
 // Product Routes
+app.get("/api/products/:id", GetProductDetailsController);
+app.get("/api/products", GetProductController);
+app.post("/api/products", CreateProductController);
 
 // 404 Not Found
 app.use((req: Request, res: Response) => {
