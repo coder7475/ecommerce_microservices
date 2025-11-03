@@ -1,12 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import morgan from "morgan";
-import {
-  createInventory,
-  getInventoryById,
-  getInventoryDetailsById,
-  updateInventory,
-} from "./controllers";
 import helmet from "helmet";
 
 // App
@@ -43,11 +37,7 @@ app.get("/api/health", (req: Request, res: Response) => {
   });
 });
 
-// Inventory Routes
-app.get("/api/inventory/:id/details", getInventoryDetailsById);
-app.get("/api/inventory/:id", getInventoryById);
-app.put("/api/inventory/:id", updateInventory);
-app.post("/api/inventory", createInventory);
+// Product Routes
 
 // 404 Not Found
 app.use((req: Request, res: Response) => {
