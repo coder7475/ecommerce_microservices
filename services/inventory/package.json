@@ -11,7 +11,9 @@
     "migrate:dev": "dotenv -e .dev.vars -- prisma migrate dev",
     "migrate:deploy": "prisma migrate deploy",
     "prisma:generate": "prisma generate --schema=./prisma/schema.prisma",
-    "prisma:push": "dotenv -e .dev.vars -- prisma db push"
+    "prisma:push": "dotenv -e .dev.vars -- prisma db push",
+    "seed": "npx prisma db seed",
+    "studio": "npx prisma studio"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^6.18.0",
