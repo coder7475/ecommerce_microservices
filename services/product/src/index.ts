@@ -29,7 +29,7 @@ app.get("/api", (req: Request, res: Response) => {
   const url = `${req.protocol}://${req.get("host")}${req.originalUrl}`;
   console.log(`Root route accessed at ${url}`);
   return res.json({
-    message: "Running Inventory Microservice!",
+    message: "Running Product Microservice!",
     envLoaded: !!process.env.DATABASE_URL,
     url,
     environment: process.env.NODE_ENV || "development",
@@ -72,7 +72,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 const PORT = process.env.PORT || 3000;
 if (process.env.NODE_ENV !== "production") {
   app.listen(PORT, () => {
-    console.log(`Server running on port http://localhost:${PORT}`);
+    console.log(`Server running on port http://localhost:${PORT}/api`);
   });
 }
 

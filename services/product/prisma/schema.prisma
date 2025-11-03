@@ -7,30 +7,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Inventory {
+enum Status {
+  DRAFT
+  PUBLISH
+  UNLISTED
+}
+
+model Product {
   id String @id @default(cuid())
   sku String @unique
-  productId String @unique
-  quantity Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Histories History[] @relation("Histories")
-}
-
-enum ActionType {
-  INIT
-  IN
-  OUT  
-}
-
-model History {
-  id String @id @default(cuid())
-  actionType ActionType
-  quantityChanged Int
-  lastQuantity Int
-  newQuantity Int 
-  inventory Inventory @relation("Histories", fields: [inventoryId], references: [id], onDelete: Cascade)
-  inventoryId String
+  name String
+  description String?
+  price Float @default(0)
+  inventoryId String?
+  status Status @default(DRAFT)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+

@@ -1,7 +1,7 @@
 import { PrismaClient, Prisma, ActionType } from "@prisma/client";
-import { withAccelerate } from "@prisma/extension-accelerate";
+// withAccelerate extension removed because '@prisma/extension-accelerate' is not installed
 
-const prisma = new PrismaClient().$extends(withAccelerate());
+const prisma = new PrismaClient();
 
 const inventoryData: Prisma.InventoryCreateInput[] = [
   {
