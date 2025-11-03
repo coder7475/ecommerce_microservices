@@ -3,6 +3,7 @@ import axios from "axios";
 import prisma from "@/prisma_db";
 import { ProductCreateDTOSchema } from "@/schemas";
 import { INVENTORY_URL } from "@/config";
+import { de } from "zod/v4/locales";
 
 const createProduct = async (
   req: Request,
@@ -33,12 +34,6 @@ const createProduct = async (
     // Create product
     const product = await prisma.product.create({
       data: parsedBody.data,
-      select: {
-        id: true,
-        name: true,
-        sku: true,
-        price: true,
-      },
     });
     console.log("Product created Successfully!");
 
@@ -67,6 +62,14 @@ const createProduct = async (
       "Product updated Successfully with inventory_id: ",
       inventory.id
     );
+
+    res.status(201).json({
+      message: "Product created successfully",
+      product: {
+        ...product,
+        inventoryId: inventory.id,
+      },
+    });
   } catch (error) {
     console.error("Error creating product:", error);
     return res.status(500).json({
@@ -75,3 +78,5 @@ const createProduct = async (
     });
   }
 };
+
+export default createProduct;
