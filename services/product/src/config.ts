@@ -1,2 +1,2 @@
 export const INVENTORY_URL =
-  process.env.INVENTORY_SERVICE_URL || "http://localhost:4000/api";
+  process.env.INVENTORY_SERVICE_URL || "http://localhost:3002/api";
