@@ -1,0 +1,31 @@
+{
+  "name": "api-gateway-service",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "dev:vercel": "vercel dev",
+    "build": "tsc && tsc-alias",
+    "start": "node dist/src/index.js",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.2",
+    "helmet": "^8.1.0",
+    "morgan": "^1.10.0",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^20.19.24",
+    "@types/pg": "^8.11.10",
+    "dotenv-cli": "^7.4.2",
+    "tsc-alias": "^1.8.16",
+    "tsx": "^4.7.1",
+    "typescript": "^5.8.3",
+    "vercel": "^37.0.0"
+  },
+  "packageManager": "pnpm@8.15.0"
+}
