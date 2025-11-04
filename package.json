@@ -1,12 +1,8 @@
 {
   "name": "ecommerce-microservices",
   "version": "1.0.0",
-  "description": "microservices for ecommerce application",
+  "description": "microservices for e-commerce application",
   "main": "index.js",
-  "workspaces": [
-    "services/*",
-    "libs/*"
-  ],
   "scripts": {
     "dev": "pnpm -r --parallel dev",
     "build": "pnpm -r build",
