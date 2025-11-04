@@ -3,7 +3,6 @@ import axios from "axios";
 import prisma from "@/prisma_db";
 import { ProductCreateDTOSchema } from "@/schemas";
 import { INVENTORY_URL } from "@/config";
-import { de } from "zod/v4/locales";
 
 const createProduct = async (
   req: Request,
