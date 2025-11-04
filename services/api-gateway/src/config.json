@@ -1,0 +1,17 @@
+{
+  "services": {
+    "product": {
+      "url": "http://localhost:3001",
+      "routes": [
+        {
+          "path": "products",
+          "method": ["GET", "POST"]
+        },
+        {
+          "path": "products/:id",
+          "method": ["GET"]
+        }
+      ]
+    }
+  }
+}
