@@ -12,6 +12,19 @@
           "method": ["GET"]
         }
       ]
+    },
+    "inventory": {
+      "url": "http://localhost:3002",
+      "routes": [
+        {
+          "path": "inventory/:id",
+          "methods": ["PUT"]
+        },
+        {
+          "path": "inventory/:id/details",
+          "methods": ["GET"]
+        }
+      ]
     }
   }
 }
