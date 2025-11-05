@@ -10,9 +10,17 @@ export const createHandler = (
   // Placeholder for actual handler creation logic
   return async (req: Request, res: Response) => {
     try {
+      let url = `${hostname}/api/${path}`;
+
+      // Replace path parameters
+      req.params &&
+        Object.keys(req.params).forEach((param) => {
+          url = url.replace(`:${param}`, req.params[param]);
+        });
+
       const { data } = await axios({
         method,
-        url: `${hostname}/api/${path}`,
+        url,
         data: req.body,
       });
 
@@ -40,9 +48,9 @@ export const configureRoutes = (app: Express) => {
       route.methods.forEach((method) => {
         const method_lower = method.toLowerCase();
         const path = route.path;
-        // console.log(method_lower, path, hostname);
+
         const handler = createHandler(hostname, path, method_lower);
-        console.log(`api/${path}`);
+
         app[method_lower](`/api/${path}`, handler);
       });
     });
