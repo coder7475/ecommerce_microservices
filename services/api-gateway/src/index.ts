@@ -4,6 +4,7 @@ import cors from "cors";
 import morgan from "morgan";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import { configureRoutes } from "./utilts";
 
 // env variables
 dotenv.config();
@@ -63,6 +64,9 @@ app.get("/api/health", (req: Request, res: Response) => {
     message: "Running API Gateway Microservice is healthy!",
   });
 });
+
+// Configure routes
+configureRoutes(app);
 
 // 404 Not Found
 app.use((req: Request, res: Response) => {
