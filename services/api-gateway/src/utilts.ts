@@ -12,7 +12,7 @@ export const createHandler = (
     try {
       const { data } = await axios({
         method,
-        url: `${hostname}${path}`,
+        url: `${hostname}/api/${path}`,
         data: req.body,
       });
 
@@ -40,8 +40,10 @@ export const configureRoutes = (app: Express) => {
       route.methods.forEach((method) => {
         const method_lower = method.toLowerCase();
         const path = route.path;
-        console.log(method_lower, path, hostname);
+        // console.log(method_lower, path, hostname);
         const handler = createHandler(hostname, path, method_lower);
+        console.log(`api/${path}`);
+        app[method_lower](`/api/${path}`, handler);
       });
     });
   });
