@@ -22,6 +22,9 @@ export const createHandler = (
         method,
         url,
         data: req.body,
+        headers: {
+          origin: "http://localhost:5173",
+        },
       });
 
       res.json(data);
