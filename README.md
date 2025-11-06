@@ -1,4 +1,4 @@
-# 🚀 Ecommerce Microservice
+# Ecommerce Microservices
 
 ## 🛠️ Quickstart
 
