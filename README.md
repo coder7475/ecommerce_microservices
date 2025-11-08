@@ -1,5 +1,14 @@
 # Ecommerce Microservices
 
+A collection of microservices for ecommerce
+
+## Services
+
+- [Product Service](./services/product/README.md)
+- [Inventory Service](./services/inventory/README.md)
+- [User Service](./services/user/README.md)
+- [API Gateway](./services/api-gateway/README.md)
+
 ## 🛠️ Quickstart
 
 ### 1. Install pnpm
@@ -22,7 +31,7 @@ pnpm dev
 
 ---
 
-## 🐳 Running with Docker Compose
+## Running with Docker Compose
 
 Start all services in the background:
 
@@ -32,13 +41,13 @@ docker compose up -d
 
 ---
 
-## 🗄️ Database Access via pgAdmin
+## Database Access via pgAdmin
 
 You can use **pgAdmin** (running in Docker) to manage your **PostgreSQL** service. Follow these steps:
 
 ---
 
-### 🧭 Step 1: Start the Services
+### Step 1: Start the Services
 
 ```bash
 docker compose up -d
@@ -57,7 +66,7 @@ docker ps
 
 ---
 
-### 🖥️ Step 2: Open pgAdmin in Your Browser
+### Step 2: Open pgAdmin in Your Browser
 
 Navigate to:
 
@@ -89,7 +98,7 @@ Click **Save** to connect!
 
 ---
 
-### 🏠 (Optional) Connect from Your Local Machine
+### (Optional) Connect from Your Local Machine
 
 To connect with external tools (e.g., DBeaver, psql) use:
 
@@ -110,7 +119,7 @@ ports:
 
 ---
 
-### ✅ Verifying the Connection
+### Verifying the Connection
 
 After connecting in pgAdmin, you should see:
 
