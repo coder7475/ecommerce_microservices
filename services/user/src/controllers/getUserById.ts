@@ -10,6 +10,7 @@ const getUserById = async (req: Request, res: Response, next: NextFunction) => {
     const field = req.query.field as string;
 
     let user: User;
+
     if (field === "authUserId") {
       user = await prisma.user.findUnique({
         where: { authUserId: id },
