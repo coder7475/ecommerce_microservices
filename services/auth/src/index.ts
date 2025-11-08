@@ -76,7 +76,8 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 // Start server (for local development)
-const PORT = process.env.PORT || 3004;
+console.log(process.env.PORT);
+const PORT = process.env.PORT || 3003;
 if (process.env.NODE_ENV !== "production") {
   app.listen(PORT, () => {
     console.log(`Server running on port http://localhost:${PORT}/api`);
