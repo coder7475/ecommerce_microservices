@@ -35,4 +35,21 @@ model User {
   status AccountStatus @default(PENDING)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  loginHistories LoginHistory[]
 }
+
+enum LoginAttempt {
+  SUCCESS
+  FAILED
+}
+
+model LoginHistory {
+  id String @id @default(cuid())
+  userId String 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ipAddress String?
+  userAgent String?
+  attempt LoginAttempt @default(SUCCESS)
+  loginAt DateTime @default(now())
+}
+
