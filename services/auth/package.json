@@ -1,0 +1,44 @@
+{
+  "name": "auth-service",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "dev:vercel": "vercel dev",
+    "build": "tsc && tsc-alias",
+    "start": "node dist/src/index.js",
+    "vercel-build": "prisma generate --schema=./prisma/schema.prisma && prisma migrate deploy",
+    "deploy": "vercel --prod",
+    "env": "dotenv -e .dev.vars",
+    "migrate:dev": "dotenv -e .dev.vars -- prisma migrate dev",
+    "migrate:deploy": "prisma migrate deploy",
+    "prisma:generate": "prisma generate --schema=./prisma/schema.prisma",
+    "prisma:push": "dotenv -e .dev.vars -- prisma db push",
+    "seed": "npx prisma db seed",
+    "studio": "npx prisma studio"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^6.18.0",
+    "@prisma/client": "^6.18.0",
+    "@prisma/extension-accelerate": "^2.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.2",
+    "helmet": "^8.1.0",
+    "morgan": "^1.10.0",
+    "pg": "^8.13.1",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^20.19.24",
+    "@types/pg": "^8.11.10",
+    "dotenv-cli": "^7.4.2",
+    "prisma": "^6.18.0",
+    "tsc-alias": "^1.8.16",
+    "tsx": "^4.7.1",
+    "typescript": "^5.8.3",
+    "vercel": "^37.0.0"
+  },
+  "packageManager": "pnpm@8.15.0"
+}
