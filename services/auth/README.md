@@ -1,7 +1,5 @@
 # Auth Microservice
 
-Deployed to: https://ecommerce-inventory-service.vercel.app/api
-
 This example shows how to implement a **REST API with TypeScript** using [Express](https://expressjs.com/), Prisma ORM and a [Prisma Postgres](https://www.prisma.io/postgres) database.
 
 ## Getting started

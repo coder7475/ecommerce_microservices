@@ -19,6 +19,7 @@
     "@prisma/adapter-pg": "^6.18.0",
     "@prisma/client": "^6.18.0",
     "@prisma/extension-accelerate": "^2.0.2",
+    "axios": "^1.13.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^4.21.2",

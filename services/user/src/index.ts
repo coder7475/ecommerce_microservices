@@ -3,7 +3,6 @@ import cors from "cors";
 import morgan from "morgan";
 import helmet from "helmet";
 import { createUser, getUserById } from "./controllers";
-import { get } from "http";
 
 // App
 const app = express();
