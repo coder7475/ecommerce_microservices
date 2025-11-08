@@ -4,3 +4,5 @@ dist/
 .vercel
 
 /src/generated/prisma
+
+/generated/prisma
