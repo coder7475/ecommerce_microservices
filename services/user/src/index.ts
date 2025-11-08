@@ -2,6 +2,8 @@ import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import morgan from "morgan";
 import helmet from "helmet";
+import { createUser, getUserById } from "./controllers";
+import { get } from "http";
 
 // App
 const app = express();
@@ -53,6 +55,10 @@ app.get("/api/health", (req: Request, res: Response) => {
 //     });
 //   }
 // });
+
+// user Routes
+app.get("/api/users/:id", getUserById);
+app.post("/api/users", createUser);
 
 // 404 Not Found
 app.use((req: Request, res: Response) => {
