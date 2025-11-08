@@ -12,13 +12,13 @@ const getUserById = async (req: Request, res: Response, next: NextFunction) => {
     let user: User;
 
     if (field === "authUserId") {
-      user = await prisma.user.findUnique({
+      user = (await prisma.user.findUnique({
         where: { authUserId: id },
-      });
+      })) as User;
     } else {
-      user = await prisma.user.findUnique({
+      user = (await prisma.user.findUnique({
         where: { id },
-      });
+      })) as User;
     }
 
     if (!user) {

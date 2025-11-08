@@ -2,7 +2,9 @@ import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import morgan from "morgan";
 import helmet from "helmet";
+import dotenv from "dotenv";
 
+dotenv.config();
 // App
 const app = express();
 
@@ -76,7 +78,6 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 // Start server (for local development)
-console.log(process.env.PORT);
 const PORT = process.env.PORT || 3003;
 if (process.env.NODE_ENV !== "production") {
   app.listen(PORT, () => {

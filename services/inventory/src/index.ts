@@ -8,7 +8,9 @@ import {
   updateInventory,
 } from "./controllers";
 import helmet from "helmet";
+import dotenv from "dotenv";
 
+dotenv.config();
 // App
 const app = express();
 

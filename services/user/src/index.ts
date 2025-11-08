@@ -3,7 +3,9 @@ import cors from "cors";
 import morgan from "morgan";
 import helmet from "helmet";
 import { createUser, getUserById } from "./controllers";
+import dotenv from "dotenv";
 
+dotenv.config();
 // App
 const app = express();
 
