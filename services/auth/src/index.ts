@@ -3,6 +3,7 @@ import cors from "cors";
 import morgan from "morgan";
 import helmet from "helmet";
 import { PORT, NODE_ENV, DATABASE_URL } from "@/config";
+import { userLogin, userRegistration, verifyToken } from "./controllers";
 
 // App
 const app = express();
@@ -56,6 +57,9 @@ app.get("/api/health", (req: Request, res: Response) => {
 // });
 
 // auth routes
+app.post("/api/auth/registration", userRegistration);
+app.post("/api/auth/login", userLogin);
+app.post("/api/auth/verify-token", verifyToken);
 
 // 404 Not Found
 app.use((req: Request, res: Response) => {

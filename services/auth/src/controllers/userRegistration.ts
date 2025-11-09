@@ -5,9 +5,9 @@ import bcrypt from "bcryptjs";
 import axios from "axios";
 import { USER_SERVICE_URL } from "@/config";
 
-export const userRegistration = async (
-  res: Response,
+const userRegistration = async (
   req: Request,
+  res: Response,
   next: NextFunction
 ) => {
   try {
