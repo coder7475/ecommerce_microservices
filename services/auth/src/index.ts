@@ -2,9 +2,8 @@ import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import morgan from "morgan";
 import helmet from "helmet";
-import dotenv from "dotenv";
+import { PORT, NODE_ENV, DATABASE_URL } from "@/config";
 
-dotenv.config();
 // App
 const app = express();
 
@@ -26,9 +25,9 @@ app.get("/api", (req: Request, res: Response) => {
   console.log(`Root route accessed at ${url}`);
   return res.json({
     message: "Running User Microservice!",
-    envLoaded: !!process.env.DATABASE_URL,
+    envLoaded: !!DATABASE_URL,
     url,
-    environment: process.env.NODE_ENV || "development",
+    environment: NODE_ENV || "development",
   });
 });
 
@@ -78,8 +77,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 // Start server (for local development)
-const PORT = process.env.PORT || 3003;
-if (process.env.NODE_ENV !== "production") {
+if (NODE_ENV !== "production") {
   app.listen(PORT, () => {
     console.log(`Server running on port http://localhost:${PORT}/api`);
   });
