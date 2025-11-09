@@ -3,7 +3,6 @@ import cors from "cors";
 import morgan from "morgan";
 import helmet from "helmet";
 import { PORT, NODE_ENV, DATABASE_URL } from "@/config";
-import { userLogin, userRegistration, verifyToken } from "./controllers";
 
 // App
 const app = express();
@@ -25,7 +24,7 @@ app.get("/api", (req: Request, res: Response) => {
   const url = `${req.protocol}://${req.get("host")}${req.originalUrl}`;
   console.log(`Root route accessed at ${url}`);
   return res.json({
-    message: "Running Auth Microservice!",
+    message: "Running Email Microservice!",
     envLoaded: !!DATABASE_URL,
     url,
     environment: NODE_ENV || "development",
@@ -35,7 +34,7 @@ app.get("/api", (req: Request, res: Response) => {
 app.get("/api/health", (req: Request, res: Response) => {
   return res.json({
     status: "Healthy",
-    message: "Running Auth Microservice is healthy!",
+    message: "Running Email Microservice is healthy!",
   });
 });
 
@@ -56,10 +55,7 @@ app.get("/api/health", (req: Request, res: Response) => {
 //   }
 // });
 
-// auth routes
-app.post("/api/auth/registration", userRegistration);
-app.post("/api/auth/login", userLogin);
-app.post("/api/auth/verify-token", verifyToken);
+// routes
 
 // 404 Not Found
 app.use((req: Request, res: Response) => {
