@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import axios from "axios";
 import { USER_SERVICE_URL } from "@/config";
 
-export const registerUser = async (
+export const userRegistration = async (
   res: Response,
   req: Request,
   next: NextFunction
@@ -66,4 +66,4 @@ export const registerUser = async (
   }
 };
 
-export default registerUser;
+export default userRegistration;
