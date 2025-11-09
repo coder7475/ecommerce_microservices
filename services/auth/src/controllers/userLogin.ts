@@ -93,7 +93,7 @@ const userLogin = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     // generate accesstoken
-    const accesstoken = jwt.sign(
+    const accessToken = jwt.sign(
       {
         userId: exitingUser.id,
         email: exitingUser.email,
@@ -112,7 +112,7 @@ const userLogin = async (req: Request, res: Response, next: NextFunction) => {
 
     return res.status(200).json({
       message: "Login successful",
-      accesstoken,
+      accessToken,
     });
   } catch (error) {
     next(error);
