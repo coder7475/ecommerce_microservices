@@ -57,8 +57,8 @@ app.get("/api/health", (req: Request, res: Response) => {
 // });
 
 // routes
-app.post("api/emails/send", sendEmail);
-app.get("api/emails", getEmails);
+app.post("/api/emails/send", sendEmail);
+app.get("/api/emails", getEmails);
 
 // 404 Not Found
 app.use((req: Request, res: Response) => {
