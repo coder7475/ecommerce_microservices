@@ -3,6 +3,7 @@ import cors from "cors";
 import morgan from "morgan";
 import helmet from "helmet";
 import { PORT, NODE_ENV, DATABASE_URL } from "@/config";
+import { getEmails, sendEmail } from "./controllers";
 
 // App
 const app = express();
@@ -56,6 +57,8 @@ app.get("/api/health", (req: Request, res: Response) => {
 // });
 
 // routes
+app.post("api/emails/send", sendEmail);
+app.get("api/emails", getEmails);
 
 // 404 Not Found
 app.use((req: Request, res: Response) => {
