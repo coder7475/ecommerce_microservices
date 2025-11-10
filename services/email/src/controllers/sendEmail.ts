@@ -1,7 +1,7 @@
-import { DEFAULT_SENDER_MAIL, transporter } from "@/config";
+import { Request, Response, NextFunction } from "express";
 import prisma from "@/prisma_db";
 import { EmailCreateSchema } from "@/schemas";
-import { Request, Response, NextFunction } from "express";
+import { DEFAULT_SENDER_MAIL, transporter } from "@/config";
 
 const sendEmail = async (req: Request, res: Response, next: NextFunction) => {
   try {
