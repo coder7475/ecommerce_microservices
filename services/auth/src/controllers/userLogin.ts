@@ -30,7 +30,6 @@ const userLogin = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const ipAddress = req.header("x-forwarded-for") || req.ip || "";
     const userAgent = req.header("user-agent") || "";
-    // console.log(ipAddress, userAgent);
 
     const parsedData = UserLoginSchema.safeParse(req.body);
 
@@ -43,12 +42,6 @@ const userLogin = async (req: Request, res: Response, next: NextFunction) => {
     });
 
     if (!exitingUser) {
-      await createLoginHistory({
-        userId: "Guest",
-        ipAddress,
-        userAgent,
-        attempt: LoginAttempt.FAILED,
-      });
       return res.status(404).json({ message: "User not found" });
     }
 
