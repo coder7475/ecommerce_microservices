@@ -54,6 +54,16 @@
           "middlewares": []
         }
       ]
+    },
+    "users": {
+      "url": "http://localhost:3004",
+      "routes": [
+        {
+          "path": "users/:id",
+          "methods": ["GET"],
+          "middlewares": ["auth"]
+        }
+      ]
     }
   }
 }
