@@ -42,14 +42,14 @@ export const createHandler = (
   };
 };
 
-const getMiddlewaresFromConfig = (names: MiddlewareName[]) => {
+const getMiddlewaresFromConfig = (names: string[]) => {
   return names.map((name) => middlewares[name]);
 };
 
 export const configureRoutes = (app: Express) => {
   const services = Object.entries(config.services);
 
-  services.forEach(([serviceName, serviceConfig]) => {
+  services.forEach(([_serviceName, serviceConfig]) => {
     const hostname = serviceConfig.url;
     const routes = serviceConfig.routes;
 
@@ -57,9 +57,11 @@ export const configureRoutes = (app: Express) => {
       route.methods.forEach((method) => {
         const method_lower = method.toLowerCase();
         const path = route.path;
+        const endpoint = `/api/${path}`;
+        const middlewares = getMiddlewaresFromConfig(route.middlewares || []);
 
         const handler = createHandler(hostname, path, method_lower);
-        app[method_lower](`/api/${path}`, handler);
+        app[method_lower](endpoint, ...middlewares, handler);
       });
     });
   });
