@@ -1,11 +1,14 @@
 import { Request, Response, NextFunction } from "express";
 
-export type Middleware = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => Promise<void> | void;
+export type HttpMethod =
+  | "get"
+  | "post"
+  | "put"
+  | "patch"
+  | "delete"
+  | "options"
+  | "head";
 
 export type FunctionMap = {
-  [key: string]: Middleware;
+  [key: string]: any;
 };

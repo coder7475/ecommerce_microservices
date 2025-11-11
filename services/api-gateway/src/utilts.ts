@@ -1,8 +1,8 @@
 import axios from "axios";
-import type { Express, NextFunction, Request, Response } from "express";
+import type { Express, Request, Response } from "express";
 import config from "./config.json";
 import middlewares from "./middlewares";
-import { MiddlewareName } from "./types";
+import { HttpMethod } from "./types";
 
 export const createHandler = (
   hostname: string,
@@ -55,7 +55,7 @@ export const configureRoutes = (app: Express) => {
 
     routes.forEach((route) => {
       route.methods.forEach((method) => {
-        const method_lower = method.toLowerCase();
+        const method_lower = method.toLowerCase() as HttpMethod;
         const path = route.path;
         const endpoint = `/api/${path}`;
         const middlewares = getMiddlewaresFromConfig(route.middlewares || []);
