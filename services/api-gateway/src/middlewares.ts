@@ -7,6 +7,6 @@ const auth = async (req: Request, res: Response, next: NextFunction) => {
   next();
 };
 
-const middlewares = [auth];
+const middlewares = { auth };
 
 export default middlewares;
