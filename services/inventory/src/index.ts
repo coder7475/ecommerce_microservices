@@ -45,21 +45,21 @@ app.get("/api/health", (req: Request, res: Response) => {
   });
 });
 
-app.use((req: Request, res: Response, next: NextFunction) => {
-  const allowedOrigins = ["http://localhost:3000", "http://127.0.0.1:3000"];
-  const origin = req.headers.origin as string;
+// app.use((req: Request, res: Response, next: NextFunction) => {
+//   const allowedOrigins = ["http://localhost:3000", "http://127.0.0.1:3000"];
+//   const origin = req.headers.origin as string;
 
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-    next();
-  } else {
-    res.status(403).json({
-      error: "CORS Error: Origin not allowed",
-      origin,
-      timestamp: new Date().toISOString(),
-    });
-  }
-});
+//   if (allowedOrigins.includes(origin)) {
+//     res.setHeader("Access-Control-Allow-Origin", origin);
+//     next();
+//   } else {
+//     res.status(403).json({
+//       error: "CORS Error: Origin not allowed",
+//       origin,
+//       timestamp: new Date().toISOString(),
+//     });
+//   }
+// });
 
 // Inventory Routes
 app.get("/api/inventory/:id/details", getInventoryDetailsById);

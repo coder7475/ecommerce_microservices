@@ -25,7 +25,7 @@ export const createHandler = (
         url,
         data: req.body,
         headers: {
-          origin: "http://localhost:3000",
+          origin: ["http://localhost:3000", "http://127.0.0.1:3000"],
           "x-user-id": req.headers["x-user-id"] || "",
           "x-user-email": req.headers["x-user-email"] || "",
           "x-user-name": req.headers["x-user-name"] || "",
@@ -36,12 +36,12 @@ export const createHandler = (
 
       res.json(data);
     } catch (error) {
+      console.log(error);
       if (error instanceof axios.AxiosError) {
         return res
           .status(error.response?.status || 500)
           .json(error.response?.data);
       }
-      console.log(error);
       return res.status(500).json({ error: "Internal Server Error" });
     }
   };
