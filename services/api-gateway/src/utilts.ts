@@ -26,6 +26,11 @@ export const createHandler = (
         data: req.body,
         headers: {
           origin: "http://localhost:3000",
+          "x-user-id": req.headers["x-user-id"] || "",
+          "x-user-email": req.headers["x-user-email"] || "",
+          "x-user-name": req.headers["x-user-name"] || "",
+          "x-user-role": req.headers["x-user-role"] || "",
+          "user-agent": req.headers["user-agent"] || "",
         },
       });
 

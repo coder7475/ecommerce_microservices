@@ -1,13 +1,10 @@
-import dotenv from "dotenv";
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import morgan from "morgan";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { configureRoutes } from "./utilts";
-
-// env variables
-dotenv.config();
+import { NODE_ENV, PORT } from "./config";
 
 // App
 const app = express();
@@ -45,8 +42,6 @@ app.use(express.json());
 // urlencoded parsing
 app.use(express.urlencoded({ extended: true }));
 
-// TODO: AUTH Middleware
-
 // Routes
 app.get("/api", (req: Request, res: Response) => {
   const url = `${req.protocol}://${req.get("host")}${req.originalUrl}`;
@@ -54,7 +49,7 @@ app.get("/api", (req: Request, res: Response) => {
   return res.json({
     message: "Running API Gateway Microservice!",
     url,
-    environment: process.env.NODE_ENV || "development",
+    environment: NODE_ENV || "development",
   });
 });
 
@@ -87,9 +82,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-// Start server (for local development)
-const PORT = process.env.PORT || 3000;
-if (process.env.NODE_ENV) {
+if (NODE_ENV) {
   app.listen(PORT, () => {
     console.log(`Server running on port http://localhost:${PORT}/api`);
   });
