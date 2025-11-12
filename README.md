@@ -8,6 +8,8 @@ A collection of microservices for ecommerce
 - [Inventory Service](./services/inventory/README.md)
 - [User Service](./services/user/README.md)
 - [API Gateway](./services/api-gateway/README.md)
+- [Auth Service](./services/auth/)
+- [Email Service](./services/auth/)
 
 ## 🛠️ Quickstart
 
