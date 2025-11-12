@@ -88,10 +88,9 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 
 // Start server (for local development)
 const PORT = process.env.PORT || 3000;
-if (process.env.NODE_ENV !== "production") {
-  app.listen(PORT, () => {
-    console.log(`Server running on port http://localhost:${PORT}/api`);
-  });
-}
+
+app.listen(PORT, () => {
+  console.log(`Server running on port http://localhost:${PORT}/api`);
+});
 
 export default app;
