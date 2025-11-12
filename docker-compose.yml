@@ -4,11 +4,11 @@ services:
   api-gateway:
     container_name: api-gateway
     image: coder7475/ecommerce-api-gateway:latest
+    env_file:
+      - services/api-gateway/.env
     restart: always
     ports:
       - "3000:3000"
-    networks:
-      - ecommerce-network
 
   postgres:
     image: postgres:17
