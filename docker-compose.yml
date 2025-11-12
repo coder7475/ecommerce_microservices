@@ -9,6 +9,63 @@ services:
     restart: always
     ports:
       - "3000:3000"
+    networks:
+      - ecommerce-network
+
+  product:
+    container_name: product-service
+    image: coder7475/ecommerce-product:latest
+    env_file:
+      - services/product/.env
+    restart: always
+    ports:
+      - "3001:3001"
+    networks:
+      - ecommerce-network
+
+  inventory:
+    container_name: inventory-service
+    image: coder7475/ecommerce-inventory:latest
+    env_file:
+      - services/inventory/.env
+    restart: always
+    ports:
+      - "3002:3002"
+    networks:
+      - ecommerce-network
+
+  auth:
+    container_name: auth-service
+    image: coder7475/ecommerce-auth:latest
+    env_file:
+      - services/auth/.env
+    restart: always
+    ports:
+      - "3003:3003"
+    networks:
+      - ecommerce-network
+
+  user:
+    container_name: user-service
+    image: coder7475/ecommerce-user:latest
+    env_file:
+      - services/api-gateway/.env
+    restart: always
+    ports:
+      - "3004:3004"
+    networks:
+      - ecommerce-network
+
+  email:
+    container_name: email
+    image: coder7475/ecommerce-email:latest
+    env_file:
+      - services/api-gateway/.env
+    restart: always
+    ports:
+      - "3005:3005"
+    networks:
+      - ecommerce-network
 
   postgres:
     image: postgres:17
