@@ -4,6 +4,7 @@ import morgan from "morgan";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { NODE_ENV, PORT } from "./config";
+import { addToCartController } from "./controllers";
 
 // App
 const app = express();
@@ -60,6 +61,7 @@ app.get("/api/health", (req: Request, res: Response) => {
 });
 
 // Configure routes
+app.post("/api/add-to-cart", addToCartController);
 
 // 404 Not Found
 app.use((req: Request, res: Response) => {
