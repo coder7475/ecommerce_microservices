@@ -29,6 +29,9 @@ dependencies:
   morgan:
     specifier: ^1.10.0
     version: 1.10.1
+  uuid:
+    specifier: ^13.0.0
+    version: 13.0.0
   zod:
     specifier: ^4.1.12
     version: 4.1.12
@@ -52,6 +55,9 @@ devDependencies:
   '@types/pg':
     specifier: ^8.11.10
     version: 8.15.6
+  '@types/uuid':
+    specifier: ^11.0.0
+    version: 11.0.0
   dotenv-cli:
     specifier: ^7.4.2
     version: 7.4.4
@@ -551,6 +557,13 @@ packages:
       '@types/http-errors': 2.0.5
       '@types/node': 20.19.25
       '@types/send': 0.17.6
+    dev: true
+
+  /@types/uuid@11.0.0:
+    resolution: {integrity: sha512-HVyk8nj2m+jcFRNazzqyVKiZezyhDKrGUA3jlEcg/nZ6Ms+qHwocba1Y/AaVaznJTAM9xpdFSh+ptbNrhOGvZA==}
+    deprecated: This is a stub types definition. uuid provides its own type definitions, so you do not need this installed.
+    dependencies:
+      uuid: 13.0.0
     dev: true
 
   /@vercel/build-utils@8.4.12:
@@ -3007,6 +3020,10 @@ packages:
     resolution: {integrity: sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==}
     engines: {node: '>= 0.4.0'}
     dev: false
+
+  /uuid@13.0.0:
+    resolution: {integrity: sha512-XQegIaBTVUjSHliKqcnFqYypAd4S+WCYt5NIeRs6w/UAry7z8Y9j5ZwRRL4kzq9U3sD6v+85er9FvkEaBpji2w==}
+    hasBin: true
 
   /uuid@3.3.2:
     resolution: {integrity: sha512-yXJmeNaw3DnnKAOKJE51sL/ZaYfWJRl1pK9dr19YFCu0ObS231AB1/LbqTKRAQ5kw8A90rA6fr4riOUpTZvQZA==}
