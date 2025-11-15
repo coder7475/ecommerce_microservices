@@ -119,10 +119,15 @@ services:
     ports:
       - "6379:6379"
       - "8001:8001"
+    volumes:
+      - redis-stack:/var/lib/redis-stack
     restart: unless-stopped
+    environment:
+      - REDIS_ARGS=--save 900 1
 volumes:
   postgres_data:
   pgadmin_data:
+  redis-stack:
 
 networks:
   ecommerce-network:
