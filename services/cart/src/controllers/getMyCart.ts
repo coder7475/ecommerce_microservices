@@ -11,6 +11,15 @@ const getMyCart = async (req: Request, res: Response, next: NextFunction) => {
         .json({ message: "Fetched Successfully", data: [] });
     }
 
+    const session = await redisClient.exists(`session:${cartSessionId}`);
+
+    if (!session) {
+      await redisClient.del(`cart:${cartSessionId}`);
+      return res
+        .status(200)
+        .json({ message: "Session Id has expired", data: [] });
+    }
+
     const cart = await redisClient.hgetall(`cart:${cartSessionId}`);
 
     return res.status(200).json({
