@@ -59,6 +59,7 @@ const addToCartController = async (
 
     return res.status(201).json({
       message: "Item Added to cart",
+      cartSessionId,
     });
 
     // TODO: check inventory for availability

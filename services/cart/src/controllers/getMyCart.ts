@@ -11,8 +11,8 @@ const getMyCart = async (req: Request, res: Response, next: NextFunction) => {
         .json({ message: "Fetched Successfully", data: [] });
     }
 
-    const session = await redisClient.exists(`session:${cartSessionId}`);
-
+    const session = await redisClient.exists(`sessions:${cartSessionId}`);
+    console.log(session);
     if (!session) {
       await redisClient.del(`cart:${cartSessionId}`);
       return res
