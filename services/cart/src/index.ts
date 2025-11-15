@@ -62,7 +62,7 @@ app.get("/api/health", (req: Request, res: Response) => {
 
 // Configure routes
 app.post("/api/cart/add-to-cart", addToCartController);
-app.get("/app/cart/me", getMyCart);
+app.get("/api/cart/me", getMyCart);
 
 // 404 Not Found
 app.use((req: Request, res: Response) => {
