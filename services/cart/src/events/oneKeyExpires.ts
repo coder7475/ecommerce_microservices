@@ -17,6 +17,12 @@ async function setup() {
 
     // Subscribe to expiration channel
     await redis.subscribe(CHANNEL_KEY);
+
+    redis.on('message', async (channel, message) => {
+        if (channel === CHANNEL_KEY) {
+            console.log("Key expired: ", message);
+        }
+    })
 }
 
 setup().catch(console.error);
