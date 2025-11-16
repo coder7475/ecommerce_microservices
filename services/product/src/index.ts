@@ -6,6 +6,7 @@ import {
   CreateProductController,
   GetProductController,
   GetProductDetailsController,
+  updateProduct,
 } from "./controller";
 import dotenv from "dotenv";
 
@@ -64,6 +65,7 @@ app.get("/api/health", (req: Request, res: Response) => {
 
 // Product Routes
 app.get("/api/products/:id", GetProductDetailsController);
+app.put("/api/products/:id", updateProduct);
 app.get("/api/products", GetProductController);
 app.post("/api/products", CreateProductController);
 
