@@ -1,6 +1,7 @@
-import { CART_TTL } from "@/config";
+import { CART_TTL, INVENTORY_SERVICE } from "@/config";
 import redisClient from "@/redis_client";
 import { CartItemSchema } from "@/schema";
+import axios from "axios";
 import { Request, Response, NextFunction } from "express";
 import { v4 as uuidv4 } from "uuid";
 
@@ -47,6 +48,17 @@ const addToCartController = async (
       res.setHeader("x-cart-session-id", cartSessionId);
     }
 
+    // check if the inventory is available
+    const { data } = await axios.get(`${INVENTORY_SERVICE}/inventory/${parsedBody.data.inventoryId}`);
+
+    if (Number(data.quantity) < parsedBody.data.quantity) {
+      return res.status(400).json({
+        message: "Inventory not available"
+      })
+    }
+
+    
+
     // add item to the cart
     await redisClient.hset(
       `cart:${cartSessionId}`,
@@ -62,7 +74,7 @@ const addToCartController = async (
       cartSessionId,
     });
 
-    // TODO: check inventory for availability
+    // TODO: 
     // TODO: update the inventory
   } catch (error) {
     next(error);
