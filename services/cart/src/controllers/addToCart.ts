@@ -69,13 +69,18 @@ const addToCartController = async (
       })
     );
 
+    // update the inventory
+    await axios.put(`${INVENTORY_SERVICE}/inventory/${parsedBody.data.inventoryId}`, {
+      quantity: parsedBody.data.quantity,
+      actionType: 'OUT'
+    });
+
+    
     return res.status(201).json({
       message: "Item Added to cart",
       cartSessionId,
     });
 
-    // TODO: 
-    // TODO: update the inventory
   } catch (error) {
     next(error);
   }
