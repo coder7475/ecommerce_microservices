@@ -24,7 +24,7 @@ app.get("/api", (req: Request, res: Response) => {
   const url = `${req.protocol}://${req.get("host")}${req.originalUrl}`;
   console.log(`Root route accessed at ${url}`);
   return res.json({
-    message: "Running Email Microservice!",
+    message: "Running Order Microservice!",
     envLoaded: !!DATABASE_URL,
     url,
     environment: NODE_ENV || "development",
@@ -34,7 +34,7 @@ app.get("/api", (req: Request, res: Response) => {
 app.get("/api/health", (req: Request, res: Response) => {
   return res.json({
     status: "Healthy",
-    message: "Running Email Microservice is healthy!",
+    message: "Running Order Microservice is healthy!",
   });
 });
 
