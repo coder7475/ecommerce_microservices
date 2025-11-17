@@ -43,7 +43,7 @@ RUN addgroup -g 1001 -S nodejs && \
 USER nodejs
 
 # Expose port
-EXPOSE 3006
+EXPOSE 3007
 
 # Set environment to production
 ENV NODE_ENV=production
