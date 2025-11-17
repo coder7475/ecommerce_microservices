@@ -1,7 +1,6 @@
 import { REDIS_HOST, REDIS_PORT } from '@/config';
 import { clearCart } from '@/services';
 import { Redis } from 'ioredis';
-import { ca } from 'zod/v4/locales';
 
 // Create Redis client instance
 const redis = new Redis({
