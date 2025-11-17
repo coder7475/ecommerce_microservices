@@ -1,5 +1,7 @@
 import { REDIS_HOST, REDIS_PORT } from '@/config';
+import { clearCart } from '@/services';
 import { Redis } from 'ioredis';
+import { ca } from 'zod/v4/locales';
 
 // Create Redis client instance
 const redis = new Redis({
@@ -21,6 +23,14 @@ async function setup() {
     redis.on('message', async (channel, message) => {
         if (channel === CHANNEL_KEY) {
             console.log("Key expired: ", message);
+            
+            const cartKey = message.split(':').pop();
+            
+            if (!cartKey) return;
+            
+            clearCart(cartKey);
+
+            console.log("Cart deleted: ", cartKey);
         }
     })
 }
