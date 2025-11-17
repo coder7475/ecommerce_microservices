@@ -3,6 +3,7 @@ import cors from "cors";
 import morgan from "morgan";
 import helmet from "helmet";
 import { PORT, NODE_ENV, DATABASE_URL } from "@/config";
+import { checkout, getOrderById, getOrders } from "./controller";
 
 // App
 const app = express();
@@ -34,7 +35,7 @@ app.get("/api", (req: Request, res: Response) => {
 app.get("/api/health", (req: Request, res: Response) => {
   return res.json({
     status: "Healthy",
-    message: "Running Order Microservice is healthy!",
+    message: "Order Microservice is healthy!",
   });
 });
 
@@ -56,6 +57,9 @@ app.get("/api/health", (req: Request, res: Response) => {
 // });
 
 // routes
+app.post("/api/orders/checkout",  checkout);
+app.get("api/orders/:id", getOrderById);
+app.get("api/orders", getOrders);
 
 // 404 Not Found
 app.use((req: Request, res: Response) => {
