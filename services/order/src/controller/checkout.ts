@@ -112,22 +112,24 @@ const checkout = async (req: Request, res: Response, next: NextFunction) => {
     });
 
     // 6) clear cart
-    await axios.get(`${CART_SERVICE}/cart/clear`, {
-      headers: {
-        "x-cart-session-id": cartSessionId,
-      },
-    });
+    // await axios.get(`${CART_SERVICE}/cart/clear`, {
+    //   headers: {
+    //     "x-cart-session-id": cartSessionId,
+    //   },
+    // });
 
     // 7) send email (no await on purpose, fire-and-forget)
-    axios.post(`${EMAIL_SERVICE}/emails/send`, {
-      recepient: userEmail,
-      subject: "Order Confirmation",
-      body: `Thank you for your order. Your order id is ${order.id}. Your order total is ${order.grandTotal}.`,
-      source: "Order Microservice - Checkout",
-    });
+    // axios.post(`${EMAIL_SERVICE}/emails/send`, {
+    //   recepient: userEmail,
+    //   subject: "Order Confirmation",
+    //   body: `Thank you for your order. Your order id is ${order.id}. Your order total is ${order.grandTotal}.`,
+    //   source: "Order Microservice - Checkout",
+    // });
 
     // send to queue
+    // 6
     sendToQueue('send-email', JSON.stringify(order));
+    // 7
     sendToQueue('clear-cart', JSON.stringify({ cartSessionId }));
 
     return res.status(201).json({
