@@ -1,108 +1,108 @@
 version: "3.9"
 
 services:
-  api-gateway:
-    container_name: api-gateway
-    image: coder7475/ecommerce-api-gateway:latest
-    env_file:
-      - services/api-gateway/.env
-    restart: always
-    ports:
-      - "3000:3000"
-    networks:
-      - ecommerce-network
+  # api-gateway:
+  #   container_name: api-gateway
+  #   image: coder7475/ecommerce-api-gateway:latest
+  #   env_file:
+  #     - services/api-gateway/.env
+  #   restart: always
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - ecommerce-network
 
-  product:
-    container_name: product-service
-    image: coder7475/ecommerce-product:latest
-    env_file:
-      - services/product/.env
-    restart: always
-    ports:
-      - "3001:3001"
-    networks:
-      - ecommerce-network
+  # product:
+  #   container_name: product-service
+  #   image: coder7475/ecommerce-product:latest
+  #   env_file:
+  #     - services/product/.env
+  #   restart: always
+  #   ports:
+  #     - "3001:3001"
+  #   networks:
+  #     - ecommerce-network
 
-  inventory:
-    container_name: inventory-service
-    image: coder7475/ecommerce-inventory:latest
-    env_file:
-      - services/inventory/.env
-    restart: always
-    ports:
-      - "3002:3002"
-    networks:
-      - ecommerce-network
+  # inventory:
+  #   container_name: inventory-service
+  #   image: coder7475/ecommerce-inventory:latest
+  #   env_file:
+  #     - services/inventory/.env
+  #   restart: always
+  #   ports:
+  #     - "3002:3002"
+  #   networks:
+  #     - ecommerce-network
 
-  auth:
-    container_name: auth-service
-    image: coder7475/ecommerce-auth:latest
-    env_file:
-      - services/auth/.env
-    restart: always
-    ports:
-      - "3003:3003"
-    networks:
-      - ecommerce-network
+  # auth:
+  #   container_name: auth-service
+  #   image: coder7475/ecommerce-auth:latest
+  #   env_file:
+  #     - services/auth/.env
+  #   restart: always
+  #   ports:
+  #     - "3003:3003"
+  #   networks:
+  #     - ecommerce-network
 
-  user:
-    container_name: user-service
-    image: coder7475/ecommerce-user:latest
-    env_file:
-      - services/api-gateway/.env
-    restart: always
-    ports:
-      - "3004:3004"
-    networks:
-      - ecommerce-network
+  # user:
+  #   container_name: user-service
+  #   image: coder7475/ecommerce-user:latest
+  #   env_file:
+  #     - services/api-gateway/.env
+  #   restart: always
+  #   ports:
+  #     - "3004:3004"
+  #   networks:
+  #     - ecommerce-network
 
-  email:
-    container_name: email-service
-    image: coder7475/ecommerce-email:latest
-    env_file:
-      - services/api-gateway/.env
-    restart: always
-    ports:
-      - "3005:3005"
-    networks:
-      - ecommerce-network
+  # email:
+  #   container_name: email-service
+  #   image: coder7475/ecommerce-email:latest
+  #   env_file:
+  #     - services/api-gateway/.env
+  #   restart: always
+  #   ports:
+  #     - "3005:3005"
+  #   networks:
+  #     - ecommerce-network
 
-  postgres:
-    image: postgres:17
-    container_name: postgres_db
-    restart: always
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin123
-      POSTGRES_DB: app_db
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d app_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-    networks:
-      - ecommerce-network
+  # postgres:
+  #   image: postgres:17
+  #   container_name: postgres_db
+  #   restart: always
+  #   environment:
+  #     POSTGRES_USER: admin
+  #     POSTGRES_PASSWORD: admin123
+  #     POSTGRES_DB: app_db
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U admin -d app_db"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #     start_period: 10s
+  #   networks:
+  #     - ecommerce-network
 
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: pgadmin_ui
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@example.com
-      PGADMIN_DEFAULT_PASSWORD: admin123
-    ports:
-      - "5050:80"
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
-    depends_on:
-      - postgres
-    networks:
-      - ecommerce-network
+  # pgadmin:
+  #   image: dpage/pgadmin4:latest
+  #   container_name: pgadmin_ui
+  #   restart: always
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: admin@example.com
+  #     PGADMIN_DEFAULT_PASSWORD: admin123
+  #   ports:
+  #     - "5050:80"
+  #   volumes:
+  #     - pgadmin_data:/var/lib/pgadmin
+  #   depends_on:
+  #     - postgres
+  #   networks:
+  #     - ecommerce-network
 
   mailhog:
     image: mailhog/mailhog
@@ -124,10 +124,19 @@ services:
     restart: unless-stopped
     environment:
       - REDIS_ARGS=--save 900 1
+  rabbit-mq:
+    image: rabbitmq:3.8-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
 volumes:
   postgres_data:
   pgadmin_data:
   redis-stack:
+  rabbitmq_data:
 
 networks:
   ecommerce-network:

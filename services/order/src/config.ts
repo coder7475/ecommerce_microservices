@@ -14,3 +14,4 @@ export const PRODUCT_SERVICE = process.env.PRODUCT_SERVICE || "http://localhost:
 export const CART_SERVICE = process.env.CART_SERVICE || "http://localhost:3006/api";
 
 export const EMAIL_SERVICE = process.env.EMAIL_SERVICE || "http://localhost:3005/api";
+export const QUEUE_URL = process.env.QUEUE_URL || "amqp://localhost";
