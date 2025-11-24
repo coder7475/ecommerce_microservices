@@ -4,6 +4,7 @@ import { Request, Response, NextFunction } from "express";
 import { CART_SERVICE, EMAIL_SERVICE, PRODUCT_SERVICE } from "@/config";
 import z from "zod";
 import prisma from "@/prisma_db";
+import sendToQueue from "@/queue";
 
 const checkout = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -124,6 +125,10 @@ const checkout = async (req: Request, res: Response, next: NextFunction) => {
       body: `Thank you for your order. Your order id is ${order.id}. Your order total is ${order.grandTotal}.`,
       source: "Order Microservice - Checkout",
     });
+
+    // send to queue
+    sendToQueue('send-email', JSON.stringify(order));
+    sendToQueue('clear_cart', JSON.stringify({ cartSessionId }));
 
     return res.status(201).json({
       message: "Order Created",
