@@ -6,6 +6,8 @@ import rateLimit from "express-rate-limit";
 import { NODE_ENV, PORT } from "./config";
 import { addToCartController, clearCart, getMyCart } from "./controllers";
 import './events/oneKeyExpires';
+import './receiver';
+
 // App
 const app = express();
 

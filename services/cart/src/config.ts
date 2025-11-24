@@ -11,3 +11,4 @@ export const REDIS_PORT = process.env.REDIS_PORT || "6379";
 export const CART_TTL = process.env.CART_TTL || "60"; // in seconds
 export const INVENTORY_SERVICE =
   process.env.INVENTORY_SERVICE || "http://localhost:3002/api";
+export const QUEUE_URL = process.env.QUEUE_URL || "amqp://localhost";

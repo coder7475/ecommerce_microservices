@@ -21,3 +21,5 @@ export const transporter = nodemailer.createTransport({
   host: SMTP_HOST,
   port: SMTP_PORT,
 });
+
+export const QUEUE_URL = process.env.QUEUE_URL || "amqp://localhost";
