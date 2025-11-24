@@ -128,7 +128,7 @@ const checkout = async (req: Request, res: Response, next: NextFunction) => {
 
     // send to queue
     sendToQueue('send-email', JSON.stringify(order));
-    sendToQueue('clear_cart', JSON.stringify({ cartSessionId }));
+    sendToQueue('clear-cart', JSON.stringify({ cartSessionId }));
 
     return res.status(201).json({
       message: "Order Created",

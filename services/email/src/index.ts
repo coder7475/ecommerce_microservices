@@ -4,6 +4,7 @@ import morgan from "morgan";
 import helmet from "helmet";
 import { PORT, NODE_ENV, DATABASE_URL } from "@/config";
 import { getEmails, sendEmail } from "./controllers";
+import './receiver';
 
 // App
 const app = express();
