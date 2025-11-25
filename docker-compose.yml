@@ -121,7 +121,7 @@ services:
       - "8001:8001"
     volumes:
       - redis-stack:/var/lib/redis-stack
-    restart: unless-stopped
+    restart: always
     environment:
       - REDIS_ARGS=--save 900 1
   rabbit-mq:
