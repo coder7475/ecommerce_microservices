@@ -1,143 +1,310 @@
-version: "3.9"
+networks:
+  ecommerce-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+  redis_data:
+  rabbitmq_data:
 
 services:
-  # api-gateway:
-  #   container_name: api-gateway
-  #   image: coder7475/ecommerce-api-gateway:latest
-  #   env_file:
-  #     - services/api-gateway/.env
-  #   restart: always
-  #   ports:
-  #     - "3000:3000"
-  #   networks:
-  #     - ecommerce-network
-
-  # product:
-  #   container_name: product-service
-  #   image: coder7475/ecommerce-product:latest
-  #   env_file:
-  #     - services/product/.env
-  #   restart: always
-  #   ports:
-  #     - "3001:3001"
-  #   networks:
-  #     - ecommerce-network
-
-  # inventory:
-  #   container_name: inventory-service
-  #   image: coder7475/ecommerce-inventory:latest
-  #   env_file:
-  #     - services/inventory/.env
-  #   restart: always
-  #   ports:
-  #     - "3002:3002"
-  #   networks:
-  #     - ecommerce-network
-
-  # auth:
-  #   container_name: auth-service
-  #   image: coder7475/ecommerce-auth:latest
-  #   env_file:
-  #     - services/auth/.env
-  #   restart: always
-  #   ports:
-  #     - "3003:3003"
-  #   networks:
-  #     - ecommerce-network
-
-  # user:
-  #   container_name: user-service
-  #   image: coder7475/ecommerce-user:latest
-  #   env_file:
-  #     - services/api-gateway/.env
-  #   restart: always
-  #   ports:
-  #     - "3004:3004"
-  #   networks:
-  #     - ecommerce-network
-
-  # email:
-  #   container_name: email-service
-  #   image: coder7475/ecommerce-email:latest
-  #   env_file:
-  #     - services/api-gateway/.env
-  #   restart: always
-  #   ports:
-  #     - "3005:3005"
-  #   networks:
-  #     - ecommerce-network
-
-  # postgres:
-  #   image: postgres:17
-  #   container_name: postgres_db
-  #   restart: always
-  #   environment:
-  #     POSTGRES_USER: admin
-  #     POSTGRES_PASSWORD: admin123
-  #     POSTGRES_DB: app_db
-  #   ports:
-  #     - "5432:5432"
-  #   volumes:
-  #     - postgres_data:/var/lib/postgresql/data
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "pg_isready -U admin -d app_db"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
-  #     start_period: 10s
-  #   networks:
-  #     - ecommerce-network
-
-  # pgadmin:
-  #   image: dpage/pgadmin4:latest
-  #   container_name: pgadmin_ui
-  #   restart: always
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: admin@example.com
-  #     PGADMIN_DEFAULT_PASSWORD: admin123
-  #   ports:
-  #     - "5050:80"
-  #   volumes:
-  #     - pgadmin_data:/var/lib/pgadmin
-  #   depends_on:
-  #     - postgres
-  #   networks:
-  #     - ecommerce-network
-
-  mailhog:
-    image: mailhog/mailhog
-    container_name: mailhog
+  # ========================================================
+  # Backing Infrastructure
+  # ========================================================
+  postgres:
+    image: postgres:17-alpine
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin123}
+      POSTGRES_DB: ${POSTGRES_DB:-app_db}
+      POSTGRES_MULTIPLE_DATABASES: ${POSTGRES_MULTIPLE_DATABASES:-auth_db,user_db,product_db,inventory_db,order_db,email_db,kong_db,keycloak_db}
     ports:
-      - "1025:1025"
-      - "8025:8025"
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-admin} -d ${POSTGRES_DB:-app_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - ecommerce-network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin_ui
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@example.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin123}
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - ecommerce-network
 
   redis-stack:
     image: redis/redis-stack:latest
     container_name: redis-stack
+    restart: always
+    command: ["redis-server", "--notify-keyspace-events", "Ex"]
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
       - "8001:8001"
     volumes:
-      - redis-stack:/var/lib/redis-stack
-    restart: always
-    environment:
-      - REDIS_ARGS=--save 900 1
-  rabbit-mq:
+      - redis_data:/var/lib/redis-stack
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ecommerce-network
+
+  rabbitmq:
     image: rabbitmq:3.8-management
     container_name: rabbitmq
+    restart: always
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "${RABBITMQ_PORT:-5672}:5672"
+      - "${RABBITMQ_MGMT_PORT:-15672}:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
-volumes:
-  postgres_data:
-  pgadmin_data:
-  redis-stack:
-  rabbitmq_data:
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - ecommerce-network
 
-networks:
-  ecommerce-network:
-    driver: bridge
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: mailhog
+    restart: always
+    ports:
+      - "${MAILHOG_SMTP_PORT:-1025}:1025"
+      - "${MAILHOG_HTTP_PORT:-8025}:8025"
+    networks:
+      - ecommerce-network
+
+  # ========================================================
+  # Microservices Tier (Development Mode with Hot-Reload)
+  # ========================================================
+  product-service:
+    container_name: product-service
+    build:
+      context: ./services/product
+      target: development
+    restart: always
+    environment:
+      PORT: 3001
+      NODE_ENV: development
+      DATABASE_URL: ${DATABASE_URL_PRODUCT:-postgresql://admin:admin123@postgres:5432/product_db}
+    ports:
+      - "${PRODUCT_SERVICE_PORT:-3001}:3001"
+    volumes:
+      - ./services/product:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  inventory-service:
+    container_name: inventory-service
+    build:
+      context: ./services/inventory
+      target: development
+    restart: always
+    environment:
+      PORT: 3002
+      NODE_ENV: development
+      DATABASE_URL: ${DATABASE_URL_INVENTORY:-postgresql://admin:admin123@postgres:5432/inventory_db}
+    ports:
+      - "${INVENTORY_SERVICE_PORT:-3002}:3002"
+    volumes:
+      - ./services/inventory:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  user-service:
+    container_name: user-service
+    build:
+      context: ./services/user
+      target: development
+    restart: always
+    environment:
+      PORT: 3004
+      NODE_ENV: development
+      DATABASE_URL: ${DATABASE_URL_USER:-postgresql://admin:admin123@postgres:5432/user_db}
+    ports:
+      - "${USER_SERVICE_PORT:-3004}:3004"
+    volumes:
+      - ./services/user:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  auth-service:
+    container_name: auth-service
+    build:
+      context: ./services/auth
+      target: development
+    restart: always
+    environment:
+      PORT: 3003
+      NODE_ENV: development
+      JWT_SECRET: ${JWT_SECRET:-super-secret-development-jwt-key}
+      DATABASE_URL: ${DATABASE_URL_AUTH:-postgresql://admin:admin123@postgres:5432/auth_db}
+      USER_SERVICE_URL: http://user-service:3004/api
+      EMAIL_SERVICE_URL: http://email-service:3005/api
+    ports:
+      - "${AUTH_SERVICE_PORT:-3003}:3003"
+    volumes:
+      - ./services/auth:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      user-service:
+        condition: service_started
+      email-service:
+        condition: service_started
+    networks:
+      - ecommerce-network
+
+  email-service:
+    container_name: email-service
+    build:
+      context: ./services/email
+      target: development
+    restart: always
+    environment:
+      PORT: 3005
+      NODE_ENV: development
+      DATABASE_URL: ${DATABASE_URL_EMAIL:-postgresql://admin:admin123@postgres:5432/email_db}
+      DEFAULT_SENDER_MAIL: ${DEFAULT_SENDER_MAIL:-admin@example.com}
+      SMTP_HOST: mailhog
+      SMTP_PORT: 1025
+      QUEUE_URL: ${QUEUE_URL:-amqp://guest:guest@rabbitmq:5672}
+    ports:
+      - "${EMAIL_SERVICE_PORT:-3005}:3005"
+    volumes:
+      - ./services/email:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      mailhog:
+        condition: service_started
+    networks:
+      - ecommerce-network
+
+  cart-service:
+    container_name: cart-service
+    build:
+      context: ./services/cart
+      target: development
+    restart: always
+    environment:
+      PORT: 3006
+      NODE_ENV: development
+      REDIS_HOST: redis-stack
+      REDIS_PORT: 6379
+      CART_TTL: ${CART_TTL:-3600}
+      INVENTORY_SERVICE: http://inventory-service:3002/api
+      QUEUE_URL: ${QUEUE_URL:-amqp://guest:guest@rabbitmq:5672}
+    ports:
+      - "${CART_SERVICE_PORT:-3006}:3006"
+    volumes:
+      - ./services/cart:/app
+      - /app/node_modules
+    depends_on:
+      redis-stack:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  order-service:
+    container_name: order-service
+    build:
+      context: ./services/order
+      target: development
+    restart: always
+    environment:
+      PORT: 3007
+      NODE_ENV: development
+      DATABASE_URL: ${DATABASE_URL_ORDER:-postgresql://admin:admin123@postgres:5432/order_db}
+      PRODUCT_SERVICE: http://product-service:3001/api
+      CART_SERVICE: http://cart-service:3006/api
+      EMAIL_SERVICE: http://email-service:3005/api
+      QUEUE_URL: ${QUEUE_URL:-amqp://guest:guest@rabbitmq:5672}
+    ports:
+      - "${ORDER_SERVICE_PORT:-3007}:3007"
+    volumes:
+      - ./services/order:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      cart-service:
+        condition: service_started
+      product-service:
+        condition: service_started
+    networks:
+      - ecommerce-network
+
+  api-gateway:
+    container_name: api-gateway
+    build:
+      context: ./services/api-gateway
+      target: development
+    restart: always
+    environment:
+      PORT: 3000
+      NODE_ENV: development
+      PRODUCT_SERVICE_URL: http://product-service:3001
+      INVENTORY_SERVICE_URL: http://inventory-service:3002
+      AUTH_SERVICE_URL: http://auth-service:3003
+      USERS_SERVICE_URL: http://user-service:3004
+    ports:
+      - "${API_GATEWAY_PORT:-3000}:3000"
+    volumes:
+      - ./services/api-gateway:/app
+      - /app/node_modules
+    depends_on:
+      product-service:
+        condition: service_started
+      inventory-service:
+        condition: service_started
+      auth-service:
+        condition: service_started
+      user-service:
+        condition: service_started
+    networks:
+      - ecommerce-network

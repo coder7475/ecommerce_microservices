@@ -20,7 +20,7 @@ const updateProduct = async (
     }
 
     const existingProduct = await prisma.product.findUnique({
-      where: { id: req.params.id }
+      where: { id: req.params.id as string }
     });
 
     if (!existingProduct) {

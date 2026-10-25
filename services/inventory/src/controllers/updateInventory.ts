@@ -1,12 +1,12 @@
 import { InventoryUpdateDTOSchema } from "@/schemas";
 import { Request, Response } from "express";
-import { ActionType } from "@prisma/client";
+import { ActionType } from "@/generated/client";
 import prisma from "@/prisma_db";
 
 const updateInventory = async (req: Request, res: Response) => {
   try {
     // check if inventory exists
-    const id = req.params.id;
+    const id = req.params.id as string;
     const inventory = await prisma.inventory.findUnique({
       where: { id },
     });

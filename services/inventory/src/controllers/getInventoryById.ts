@@ -3,7 +3,7 @@ import prisma from "@/prisma_db";
 
 const getInventoryById = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id;
+    const id = req.params.id as string;
 
     // Fetch inventory
     const inventory = await prisma.inventory.findUnique({

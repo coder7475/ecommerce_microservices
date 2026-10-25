@@ -1,11 +1,11 @@
-import { User } from "@/generated/prisma/client";
+import { User } from "@/generated/client";
 import prisma from "@/prisma_db";
 import { Request, Response, NextFunction } from "express";
 
 // users/:id?field=id|authUserId
 const getUserById = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
 
     const field = req.query.field as string;
 

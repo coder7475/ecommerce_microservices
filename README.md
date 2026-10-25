@@ -6,195 +6,288 @@ A collection of TypeScript/Node.js microservices for an e-commerce platform buil
 
 ## 📦 Services Overview
 
-| Service | Port (Default / Recommended) | Backing Store / Queue | Description & Routes | Link |
-|---------|------------------------------|------------------------|----------------------|------|
-| **API Gateway** | `3000` | None (Proxy) | Reverse proxy, rate limiting, and auth dispatch | [README](./services/api-gateway/README.md) |
-| **Product Service** | `3001` | PostgreSQL (Prisma) | Products catalog, creation, updates | [README](./services/product/README.md) |
-| **Inventory Service** | `3002` | PostgreSQL (Prisma) | Stock tracking and inventory adjustments | [README](./services/inventory/README.md) |
-| **Auth Service** | `3003` | PostgreSQL (Prisma) | Registration, login, verification codes, JWT | [README](./services/auth/README.md) |
-| **User Service** | `3004` | PostgreSQL (Prisma) | User profiles and account data | [README](./services/user/README.md) |
-| **Email Service** | `3005` | PostgreSQL + RabbitMQ + SMTP | Transactional email delivery and email logs | [README](./services/email/README.md) |
-| **Cart Service** | `3006` | Redis + RabbitMQ | Cart session store, TTL expiration, event consumer | [README](./services/cart/README.md) |
-| **Order Service** | `3007` | PostgreSQL + RabbitMQ | Checkout orchestrator, order state, event publisher | [README](./services/order/README.md) |
+| Service | Port | Database / Queue | Description & Endpoints |
+|---------|------|------------------|-------------------------|
+| **[API Gateway](./services/api-gateway/README.md)** | `3000` | None (Reverse Proxy) | Reverse proxy, rate limiting, and auth dispatch |
+| **[Product Service](./services/product/README.md)** | `3001` | PostgreSQL (`product_db`) | Products catalog, creation, updates |
+| **[Inventory Service](./services/inventory/README.md)** | `3002` | PostgreSQL (`inventory_db`) | Stock tracking and inventory adjustments |
+| **[Auth Service](./services/auth/README.md)** | `3003` | PostgreSQL (`auth_db`) | Registration, login, verification codes, JWT |
+| **[User Service](./services/user/README.md)** | `3004` | PostgreSQL (`user_db`) | User profiles and account data |
+| **[Email Service](./services/email/README.md)** | `3005` | PostgreSQL (`email_db`) + RabbitMQ + MailHog | Transactional email delivery and logging |
+| **[Cart Service](./services/cart/README.md)** | `3006` | Redis Stack + RabbitMQ | Cart session store, TTL expiration, event consumer |
+| **[Order Service](./services/order/README.md)** | `3007` | PostgreSQL (`order_db`) + RabbitMQ | Checkout orchestrator, order state, event publisher |
 
 ---
 
 ## 🏗️ Architecture & Backing Infrastructure
 
-- **API Gateway (`3000`)**: Routes incoming client requests to backend services via Axios based on configuration in `services/api-gateway/src/config.json`.
-- **Database (PostgreSQL `5432`)**: Used by Product, Inventory, User, Auth, Order, and Email services via Prisma.
-- **Cache & Session (Redis `6379`)**: Manages shopping cart sessions with TTL and keyspace expiration notifications (`__keyevent@0__:expired`).
-- **Message Broker (RabbitMQ `5672`)**: Direct exchange (`order_exchange`) routes asynchronous tasks from Order Service:
+- **API Gateway (`3000`)**: Routes incoming client requests to backend services via Axios based on configuration in `services/api-gateway/src/config.json` with environment variable overrides (`PRODUCT_SERVICE_URL`, etc.).
+- **Simulated Multi-Database PostgreSQL (`5432`)**: Single PostgreSQL 17 container executing [`scripts/init-multiple-dbs.sh`](./scripts/init-multiple-dbs.sh) on first boot to create isolated databases: `auth_db`, `user_db`, `product_db`, `inventory_db`, `order_db`, `email_db`, `kong_db`, and `keycloak_db`.
+- **Cache & Session (Redis `6379`)**: Manages shopping cart sessions with TTL and keyspace expiration notifications (`--notify-keyspace-events Ex`).
+- **Message Broker (RabbitMQ `5672` / UI `15672`)**: Direct exchange (`order_exchange`) routes asynchronous tasks from Order Service:
   - `send-email` queue → consumed by Email Service.
   - `clear-cart` queue → consumed by Cart Service.
 - **SMTP Server (MailHog `1025` / UI `8025`)**: Intercepts outgoing transactional emails for local testing.
 
 ---
 
-## 🛠️ Getting Started
+## 🛠️ Prerequisites
 
-### 1. Prerequisites
-- **Node.js** (v20+ recommended)
-- **pnpm** (v8 or v10)
+Ensure you have the following installed on your workstation:
+- **Docker & Docker Compose** (v20.10+ / Compose v2+)
+- **Node.js** (v20+ LTS recommended)
+- **pnpm** (v8 or v10):
   ```bash
   npm install -g pnpm
   ```
-- **Docker & Docker Compose**
 
 ---
 
-### 2. Start Infrastructure with Docker Compose
+## 💻 1. Running in Development (`dev`)
 
-Start the shared message broker, Redis cache, and MailHog mail catcher:
+You can develop using **Full Docker Compose** (runs everything in containers with live hot-reload) or **Hybrid Mode** (runs databases/queues in Docker, services locally on your machine).
 
+### Option A: Full Docker Compose Development (Recommended)
+
+1. **Configure local environment variables**:
+   ```bash
+   cp .env.dev.example .env.dev
+   ```
+
+2. **Start all backing infrastructure and microservices**:
+   ```bash
+   docker compose --env-file .env.dev up --build
+   ```
+   > **How Hot-Reloading Works**: Each service uses the `development` build stage. Source code from `./services/<name>` is bind-mounted directly into `/app` inside the container, triggering `tsx watch` to reload automatically whenever you save a file.
+
+3. **Initialize database tables (First-time setup)**:
+   In a separate terminal window, push Prisma schemas to their respective databases:
+   ```bash
+   pnpm --filter product-service prisma db push
+   pnpm --filter inventory-service prisma db push
+   pnpm --filter auth-service prisma db push
+   pnpm --filter user-service prisma db push
+   pnpm --filter order-service prisma db push
+   pnpm --filter email-service prisma db push
+   ```
+
+4. **Spinning up a single service**:
+   If you only want to work on a specific service (e.g. `product-service` and its database):
+   ```bash
+   docker compose --env-file .env.dev up postgres product-service
+   ```
+
+---
+
+### Option B: Hybrid Development (Infra in Docker, Services on Host)
+
+Use this mode if you prefer running services directly via local Node.js/pnpm commands:
+
+1. **Start only backing infrastructure**:
+   ```bash
+   docker compose --env-file .env.dev up -d postgres redis-stack rabbitmq mailhog
+   ```
+
+2. **Install monorepo dependencies**:
+   ```bash
+   pnpm -r install
+   ```
+
+3. **Run all microservices concurrently**:
+   ```bash
+   pnpm dev
+   ```
+
+4. **Or run an individual service**:
+   ```bash
+   pnpm --filter product-service dev
+   # Or directly from its folder:
+   cd services/product && pnpm dev
+   ```
+
+---
+
+## 🚀 2. Running in Production (`prod`)
+
+Production builds compile TypeScript into optimized JavaScript, prune `devDependencies`, and run as unprivileged `USER nodejs` inside hardened Alpine containers with `dumb-init`.
+
+### Step 1: Prepare Production Environment
+Copy the production template and set cryptographically secure passwords:
 ```bash
-docker compose up -d
+cp .env.prod.example .env.prod
+```
+> [!IMPORTANT]
+> Edit `.env.prod` to replace placeholder secrets (`CHANGE_ME_IN_PRODUCTION`, `CHANGE_ME_TO_A_CRYPTOGRAPHICALLY_SECURE_JWT_SECRET`, etc.).
+
+### Step 2: Build & Start Production Containers
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.prod up --build -d
 ```
 
-> **Note on PostgreSQL**: If running PostgreSQL via Docker, ensure the `postgres` service block in `docker-compose.yml` is uncommented and running on port `5432`.
-
-#### Backing Infrastructure Dashboards:
-- **MailHog Web UI:** [http://localhost:8025](http://localhost:8025)
-- **RabbitMQ Management:** [http://localhost:15672](http://localhost:15672) *(guest / guest)*
-- **RedisInsight (Redis Stack):** [http://localhost:8001](http://localhost:8001)
-- **pgAdmin 4 (if enabled):** [http://localhost:5050](http://localhost:5050) *(admin@example.com / admin123)*
-
----
-
-### 3. Install Dependencies
-
-Install all dependencies across all services:
-
+### Step 3: Run Database Migrations in Production
+Deploy existing Prisma migrations safely against the production databases:
 ```bash
-pnpm -r install
+docker compose -f docker-compose.prod.yml exec product-service npx prisma migrate deploy
+docker compose -f docker-compose.prod.yml exec inventory-service npx prisma migrate deploy
+docker compose -f docker-compose.prod.yml exec auth-service npx prisma migrate deploy
+docker compose -f docker-compose.prod.yml exec user-service npx prisma migrate deploy
+docker compose -f docker-compose.prod.yml exec order-service npx prisma migrate deploy
+docker compose -f docker-compose.prod.yml exec email-service npx prisma migrate deploy
 ```
 
----
-
-### 4. Configure Environment Variables
-
-Each service expects a `.env` file in its root directory (`services/<service-name>/.env`).
-
-#### Essential Variables by Service:
-
-- **`services/product/.env`**:
-  ```env
-  PORT=3001
-  NODE_ENV=development
-  DATABASE_URL="postgresql://admin:admin123@localhost:5432/app_db?schema=product"
-  ```
-
-- **`services/inventory/.env`**:
-  ```env
-  PORT=3002
-  NODE_ENV=development
-  DATABASE_URL="postgresql://admin:admin123@localhost:5432/app_db?schema=inventory"
-  ```
-
-- **`services/auth/.env`**:
-  ```env
-  PORT=3003
-  NODE_ENV=development
-  JWT_SECRET="your_jwt_secret_key"
-  DATABASE_URL="postgresql://admin:admin123@localhost:5432/app_db?schema=auth"
-  USER_SERVICE_URL="http://localhost:3004/api"
-  EMAIL_SERVICE_URL="http://localhost:3005/api"
-  ```
-
-- **`services/user/.env`**:
-  ```env
-  PORT=3004
-  NODE_ENV=development
-  DATABASE_URL="postgresql://admin:admin123@localhost:5432/app_db?schema=user"
-  ```
-
-- **`services/email/.env`**:
-  ```env
-  PORT=3005
-  NODE_ENV=development
-  DATABASE_URL="postgresql://admin:admin123@localhost:5432/app_db?schema=email"
-  DEFAULT_SENDER_MAIL="admin@example.com"
-  SMTP_HOST="localhost"
-  SMTP_PORT=1025
-  QUEUE_URL="amqp://localhost"
-  ```
-
-- **`services/cart/.env`**:
-  ```env
-  PORT=3006
-  NODE_ENV=development
-  REDIS_HOST="localhost"
-  REDIS_PORT=6379
-  CART_TTL=3600
-  INVENTORY_SERVICE="http://localhost:3002/api"
-  QUEUE_URL="amqp://localhost"
-  ```
-
-- **`services/order/.env`**:
-  ```env
-  PORT=3007
-  NODE_ENV=development
-  DATABASE_URL="postgresql://admin:admin123@localhost:5432/app_db?schema=order"
-  PRODUCT_SERVICE="http://localhost:3001/api"
-  CART_SERVICE="http://localhost:3006/api"
-  EMAIL_SERVICE="http://localhost:3005/api"
-  QUEUE_URL="amqp://localhost"
-  ```
-
-- **`services/api-gateway/.env`**:
-  ```env
-  PORT=3000
-  NODE_ENV=development
-  ```
-
----
-
-### 5. Generate Prisma Clients & Push Database Schemas
-
-For services backed by Prisma (`product`, `inventory`, `user`, `auth`, `order`, `email`), generate clients and push migrations:
-
+### Step 4: Verify Container Health & Status
 ```bash
-# Generate Prisma Client for all services
-pnpm -r prisma:generate
+docker compose -f docker-compose.prod.yml ps
+```
 
-# Deploy migrations or push schemas (run in each Prisma service or via pnpm filter)
-pnpm --filter product-service prisma db push
-pnpm --filter inventory-service prisma db push
-pnpm --filter auth-service prisma db push
-pnpm --filter user-service prisma db push
-pnpm --filter order-service prisma db push
-pnpm --filter email-service prisma db push
+### Step 5: Graceful Shutdown
+```bash
+docker compose -f docker-compose.prod.yml down
 ```
 
 ---
 
-### 6. Run the Services
+## 🔍 3. Debugging & Troubleshooting (`debug`)
 
-#### Run all services concurrently:
-```bash
-pnpm dev
-```
+### Viewing Logs
 
-#### Run a specific service in development:
+- **Stream live logs across all containers**:
+  ```bash
+  docker compose logs -f
+  ```
+- **Stream logs for a specific service**:
+  ```bash
+  docker compose logs -f product-service
+  docker compose logs -f order-service
+  ```
+- **Filter for runtime errors**:
+  ```bash
+  docker compose logs -f | grep -E "Error|error|ERR|fail"
+  ```
+
+---
+
+### Interactive Shell Access
+
+Enter any running container to inspect files, network access, or runtime environment variables:
 ```bash
-pnpm --filter product-service dev
-# or navigate into the service directory:
-cd services/product && pnpm dev
+# Open an interactive shell inside a microservice
+docker compose exec product-service sh
+
+# Inspect running environment variables
+docker compose exec product-service env
+
+# Test network connectivity to another service
+docker compose exec api-gateway wget -qO- http://product-service:3001/api/health
 ```
 
 ---
 
-## 🗄️ Database Access via pgAdmin
+### Database Debugging
 
-If using the optional pgAdmin container from `docker-compose.yml`:
+1. **Connect via CLI (`psql`)**:
+   Access any database directly on the PostgreSQL container:
+   ```bash
+   # Connect to product_db
+   docker compose exec postgres psql -U admin -d product_db
 
-1. Navigate to: [http://localhost:5050](http://localhost:5050)
-2. Login with:
-   - **Email:** `admin@example.com`
-   - **Password:** `admin123`
-3. Register the PostgreSQL Server:
-   - **Host:** `postgres` (or `localhost` / `host.docker.internal`)
-   - **Port:** `5432`
-   - **Maintenance DB:** `app_db`
-   - **Username:** `admin`
-   - **Password:** `admin123`
+   # Useful psql commands:
+   # \dt       List all tables
+   # \d table  Describe table schema
+   # \q        Quit
+   ```
+
+2. **Visual Inspection via Prisma Studio**:
+   Open a browser-based GUI to view and edit database rows directly:
+   ```bash
+   cd services/product
+   DATABASE_URL="postgresql://admin:admin123@localhost:5432/product_db" npx prisma studio
+   ```
+   Navigate to [http://localhost:5555](http://localhost:5555).
+
+3. **Visual Inspection via pgAdmin 4**:
+   Open [http://localhost:5050](http://localhost:5050) *(Email: `admin@example.com` / Password: `admin123`)*:
+   - Host: `postgres`
+   - Port: `5432`
+   - Maintenance Database: `app_db` (or `product_db`, `order_db`, etc.)
+   - Username: `admin` / Password: `admin123`
+
+---
+
+### Message Queue & Cache Debugging
+
+1. **RabbitMQ Management Dashboard**:
+   - URL: [http://localhost:15672](http://localhost:15672) *(Credentials: `guest` / `guest`)*
+   - Inspect active exchanges (`order_exchange`), queues (`send-email`, `clear-cart`), and message rates.
+   - CLI check queue counts:
+     ```bash
+     docker compose exec rabbitmq rabbitmqctl list_queues
+     ```
+
+2. **Redis Stack & Keyspace Notifications**:
+   - URL: [http://localhost:8001](http://localhost:8001) (RedisInsight GUI)
+   - CLI real-time monitor:
+     ```bash
+     docker compose exec redis-stack redis-cli MONITOR
+     ```
+   - Verify cart keys:
+     ```bash
+     docker compose exec redis-stack redis-cli KEYS "cart:*"
+     ```
+
+3. **MailHog Email Interceptor**:
+   - URL: [http://localhost:8025](http://localhost:8025)
+   - Real-time UI showing all outgoing transactional emails from `auth-service` and `email-service` without sending real emails.
+
+---
+
+### VS Code Debugger Attachment (Breakpoints)
+
+To attach a debugger to any service running with `tsx`:
+
+1. Update the service `command` in `docker-compose.yml` to include the `--inspect` flag:
+   ```yaml
+   product-service:
+     command: ["pnpm", "exec", "tsx", "watch", "--inspect=0.0.0.0:9229", "src/index.ts"]
+     ports:
+       - "3001:3001"
+       - "9229:9229"
+   ```
+
+2. Add a `.vscode/launch.json` configuration:
+   ```json
+   {
+     "version": "0.2.0",
+     "configurations": [
+       {
+         "type": "node",
+         "request": "attach",
+         "name": "Attach to Docker: Product Service",
+         "port": 9229,
+         "address": "localhost",
+         "localRoot": "${workspaceFolder}/services/product",
+         "remoteRoot": "/app",
+         "restart": true
+       }
+     ]
+   }
+   ```
+
+---
+
+### Common Issues & Quick Fixes
+
+| Issue | Cause | Solution |
+|---|---|---|
+| `bind: address already in use` | Local Postgres (`5432`) or Redis (`6379`) is running on host | Stop local host services: `sudo systemctl stop postgresql redis` or modify port mappings in `.env.dev` |
+| `database "product_db" does not exist` | PostgreSQL volume was created before `init-multiple-dbs.sh` ran | Reset Postgres volume: `docker compose down -v` and restart with `docker compose --env-file .env.dev up` |
+| `Error: P1001: Can't reach database server` | Database container still booting or healthcheck pending | Wait for `postgres_db` status to become `(healthy)` or inspect logs: `docker compose logs postgres` |
+| Changes in code not reflecting | Bind mount caching or anonymous volume issue | Ensure service runs `target: development` and verify volumes in `docker-compose.yml` |
+| Full reset of all data and containers | Stale cache or corrupt volumes | Run `docker compose down -v && docker compose --env-file .env.dev up --build` |
+
+---
+
+## 🗺️ Architectural Roadmaps
+
+For detailed multi-stage Docker build specs, Kong API Gateway migration, Keycloak OIDC integration, and DevSecOps workflows, see:
+- 📄 **[plan/dockerize_monorepo_engineering_plan.md](./plan/dockerize_monorepo_engineering_plan.md)**

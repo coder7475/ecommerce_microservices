@@ -5,6 +5,7 @@ __pycache__/
 
 # Node
 **/node_modules/
+**/src/generated/
 dist/
 .vite/
 
@@ -14,3 +15,5 @@ dist/
 .DS_Store
 
 .env
+.env.*
+!.env*.example

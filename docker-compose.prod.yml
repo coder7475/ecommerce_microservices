@@ -1,0 +1,255 @@
+networks:
+  ecommerce-network:
+    driver: bridge
+
+volumes:
+  postgres_prod_data:
+  redis_prod_data:
+  rabbitmq_prod_data:
+
+services:
+  # ========================================================
+  # Backing Infrastructure (Production)
+  # ========================================================
+  postgres:
+    image: postgres:17-alpine
+    container_name: postgres_prod
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-prod_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-app_db}
+      POSTGRES_MULTIPLE_DATABASES: ${POSTGRES_MULTIPLE_DATABASES:-auth_db,user_db,product_db,inventory_db,order_db,email_db,kong_db,keycloak_db}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+      - ./scripts/init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-prod_admin} -d ${POSTGRES_DB:-app_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ecommerce-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis_prod
+    restart: always
+    command: ["redis-server", "--notify-keyspace-events", "Ex"]
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_prod_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ecommerce-network
+
+  rabbitmq:
+    image: rabbitmq:3.8-management-alpine
+    container_name: rabbitmq_prod
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+    ports:
+      - "${RABBITMQ_PORT:-5672}:5672"
+    volumes:
+      - rabbitmq_prod_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ecommerce-network
+
+  # ========================================================
+  # Microservices Tier (Immutable Production Builds)
+  # ========================================================
+  product-service:
+    container_name: product-service-prod
+    build:
+      context: ./services/product
+      target: production
+    restart: always
+    environment:
+      PORT: 3001
+      NODE_ENV: production
+      DATABASE_URL: ${DATABASE_URL_PRODUCT}
+    ports:
+      - "${PRODUCT_SERVICE_PORT:-3001}:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  inventory-service:
+    container_name: inventory-service-prod
+    build:
+      context: ./services/inventory
+      target: production
+    restart: always
+    environment:
+      PORT: 3002
+      NODE_ENV: production
+      DATABASE_URL: ${DATABASE_URL_INVENTORY}
+    ports:
+      - "${INVENTORY_SERVICE_PORT:-3002}:3002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  user-service:
+    container_name: user-service-prod
+    build:
+      context: ./services/user
+      target: production
+    restart: always
+    environment:
+      PORT: 3004
+      NODE_ENV: production
+      DATABASE_URL: ${DATABASE_URL_USER}
+    ports:
+      - "${USER_SERVICE_PORT:-3004}:3004"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  auth-service:
+    container_name: auth-service-prod
+    build:
+      context: ./services/auth
+      target: production
+    restart: always
+    environment:
+      PORT: 3003
+      NODE_ENV: production
+      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: ${DATABASE_URL_AUTH}
+      USER_SERVICE_URL: http://user-service:3004/api
+      EMAIL_SERVICE_URL: http://email-service:3005/api
+    ports:
+      - "${AUTH_SERVICE_PORT:-3003}:3003"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      user-service:
+        condition: service_started
+      email-service:
+        condition: service_started
+    networks:
+      - ecommerce-network
+
+  email-service:
+    container_name: email-service-prod
+    build:
+      context: ./services/email
+      target: production
+    restart: always
+    environment:
+      PORT: 3005
+      NODE_ENV: production
+      DATABASE_URL: ${DATABASE_URL_EMAIL}
+      DEFAULT_SENDER_MAIL: ${DEFAULT_SENDER_MAIL}
+      SMTP_HOST: ${MAIL_SMTP_HOST}
+      SMTP_PORT: ${MAIL_SMTP_PORT:-587}
+      QUEUE_URL: ${QUEUE_URL}
+    ports:
+      - "${EMAIL_SERVICE_PORT:-3005}:3005"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  cart-service:
+    container_name: cart-service-prod
+    build:
+      context: ./services/cart
+      target: production
+    restart: always
+    environment:
+      PORT: 3006
+      NODE_ENV: production
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      CART_TTL: ${CART_TTL:-3600}
+      INVENTORY_SERVICE: http://inventory-service:3002/api
+      QUEUE_URL: ${QUEUE_URL}
+    ports:
+      - "${CART_SERVICE_PORT:-3006}:3006"
+    depends_on:
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  order-service:
+    container_name: order-service-prod
+    build:
+      context: ./services/order
+      target: production
+    restart: always
+    environment:
+      PORT: 3007
+      NODE_ENV: production
+      DATABASE_URL: ${DATABASE_URL_ORDER}
+      PRODUCT_SERVICE: http://product-service:3001/api
+      CART_SERVICE: http://cart-service:3006/api
+      EMAIL_SERVICE: http://email-service:3005/api
+      QUEUE_URL: ${QUEUE_URL}
+    ports:
+      - "${ORDER_SERVICE_PORT:-3007}:3007"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      cart-service:
+        condition: service_started
+      product-service:
+        condition: service_started
+    networks:
+      - ecommerce-network
+
+  api-gateway:
+    container_name: api-gateway-prod
+    build:
+      context: ./services/api-gateway
+      target: production
+    restart: always
+    environment:
+      PORT: 3000
+      NODE_ENV: production
+      PRODUCT_SERVICE_URL: http://product-service:3001
+      INVENTORY_SERVICE_URL: http://inventory-service:3002
+      AUTH_SERVICE_URL: http://auth-service:3003
+      USERS_SERVICE_URL: http://user-service:3004
+    ports:
+      - "${API_GATEWAY_PORT:-3000}:3000"
+    depends_on:
+      product-service:
+        condition: service_started
+      inventory-service:
+        condition: service_started
+      auth-service:
+        condition: service_started
+      user-service:
+        condition: service_started
+    networks:
+      - ecommerce-network

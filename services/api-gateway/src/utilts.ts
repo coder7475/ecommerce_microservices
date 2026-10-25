@@ -17,7 +17,9 @@ export const createHandler = (
       // Replace path parameters
       req.params &&
         Object.keys(req.params).forEach((param) => {
-          url = url.replace(`:${param}`, req.params[param]);
+          const paramVal = req.params[param];
+          const valStr = Array.isArray(paramVal) ? paramVal.join(",") : String(paramVal ?? "");
+          url = url.replace(`:${param}`, valStr);
         });
 
       const { data } = await axios({
@@ -54,8 +56,9 @@ const getMiddlewaresFromConfig = (names: string[]) => {
 export const configureRoutes = (app: Express) => {
   const services = Object.entries(config.services);
 
-  services.forEach(([_serviceName, serviceConfig]) => {
-    const hostname = serviceConfig.url;
+  services.forEach(([serviceName, serviceConfig]) => {
+    const envUrl = process.env[`${serviceName.toUpperCase()}_SERVICE_URL`];
+    const hostname = envUrl ? envUrl.replace(/\/api\/?$/, "") : serviceConfig.url;
     const routes = serviceConfig.routes;
 
     routes.forEach((route) => {

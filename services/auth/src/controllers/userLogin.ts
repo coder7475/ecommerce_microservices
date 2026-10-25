@@ -4,7 +4,7 @@ import prisma from "@/prisma_db";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-import { AccountStatus, LoginAttempt } from "@prisma/client";
+import { AccountStatus, LoginAttempt } from "@/generated/client";
 import { JWT_SECRET } from "@/config";
 
 type LoginHistory = {

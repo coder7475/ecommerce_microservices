@@ -1,4 +1,4 @@
-import { Status } from "@prisma/client";
+import { Status } from "./generated/client";
 import z from "zod";
 
 export const ProductCreateDTOSchema = z.object({

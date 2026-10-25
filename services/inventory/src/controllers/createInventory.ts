@@ -1,6 +1,6 @@
 import { InventoryCreateDTOSchema } from "@/schemas";
 import { Request, Response } from "express";
-import { ActionType } from "@prisma/client";
+import { ActionType } from "@/generated/client";
 import prisma from "@/prisma_db";
 
 const createInventory = async (req: Request, res: Response) => {

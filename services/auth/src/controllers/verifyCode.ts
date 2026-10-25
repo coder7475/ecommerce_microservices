@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import prisma from "@/prisma_db";
 import { EmailCodeVerificationSchema } from "../schemas";
-import { AccountStatus, VerificationStatus } from "@prisma/client";
+import { AccountStatus, VerificationStatus } from "@/generated/client";
 import axios from "axios";
 import { EMAIL_SERVICE_URL } from "@/config";
 
